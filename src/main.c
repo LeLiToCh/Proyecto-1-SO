@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
     }
 
     // Load font - expects "font.ttf" in current working directory
-    TTF_Font *font = TTF_OpenFont("font.ttf", 24);
+    TTF_Font *font = TTF_OpenFont("C:\\Users\\Emmanuel Chavarría\\Documents\\GitHub\\Proyecto-1-SO\\font.ttf", 24);
     if (!font) {
         fprintf(stderr, "Failed to open font.ttf: %s\n", TTF_GetError());
         SDL_DestroyRenderer(ren);

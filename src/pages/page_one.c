@@ -1,6 +1,7 @@
 // Inicializador page: collects inputs and prints them when "Continuar" is clicked
 #include <stdbool.h>   // <-- debe ir PRIMERO de todo
 #include "page_one.h"
+#include "page_main.h" // para obtener modo seleccionado en pantalla principal
 #include <stdio.h>
 #include <string.h>
 #ifdef _WIN32
@@ -22,11 +23,10 @@ static bool filepath_active = false;
 
 static int cantidad = 1;
 
-// Dropdown options
-static const char *ciphers[] = {"xor", "andxor", "orandor", "xornot", "andor"};
-static int cipher_selected = 0;
-static SDL_Rect dropdown_rect = {0,0,220,30};
-static bool dropdown_open = false;
+// Clave de 9 bits: campo de texto binario (0 o 1), máx 9 dígitos
+static SDL_Rect mode_rect = {0,0,220,30};
+static char mode_text[16] = ""; // guardaremos cadena de hasta 9 dígitos
+static bool mode_active = false;
 
 // helper: open native file dialog into out buffer (UTF-8). Returns 1 on success.
 static int open_file_dialog(char *out, size_t outlen) {
@@ -67,7 +67,7 @@ static int open_file_dialog(char *out, size_t outlen) {
 #endif
 }
 
-// file path (declared above)
+    // file path (declared above)
 
 // helper: check if point inside rect
 static bool pt_in_rect(int x, int y, SDL_Rect *r) {
@@ -87,7 +87,11 @@ void page_one_handle_event(SDL_Event *e, int *out_next_page) {
             // print values to stdout
             printf("Identificador: %s\n", identificador);
             printf("Cantidad: %d\n", cantidad);
-            printf("Cifrado: %s\n", ciphers[cipher_selected]);
+            // Imprimir modo desde la pantalla principal (botones)
+            const char *exec_mode_main = page_main_get_execution_mode();
+            printf("Modo de ejecucion (inicio): %s\n", exec_mode_main);
+            // Imprimir la clave completa de 9 bits escrita en el textfield
+            printf("Clave de 9 bits: %s\n", mode_text[0] ? mode_text : "(vacia)");
             printf("Archivo: %s\n", filepath);
             fflush(stdout);
             return;
@@ -100,8 +104,17 @@ void page_one_handle_event(SDL_Event *e, int *out_next_page) {
     SDL_Rect down = {660,250,30,30};
     SDL_Rect fpbox = {120,490,480,30};
     SDL_Rect search_btn = { fpbox.x + fpbox.w + 8, fpbox.y, 80, fpbox.h };
+    // Campo de modo (coincidir con render)
+    mode_rect.x = 120; mode_rect.y = 280; mode_rect.w = 300; mode_rect.h = 30;
     if (pt_in_rect(mx,my,&idbox)) {
         identificador_active = true;
+        filepath_active = false;
+        mode_active = false;
+        SDL_StartTextInput();
+    } else if (pt_in_rect(mx,my,&mode_rect)) {
+        // Foco en textfield de modo (sólo acepta 0/1, hasta 8)
+        mode_active = true;
+        identificador_active = false;
         filepath_active = false;
         SDL_StartTextInput();
     } else if (pt_in_rect(mx,my,&fpbox) || pt_in_rect(mx,my,&search_btn)) {
@@ -114,38 +127,41 @@ void page_one_handle_event(SDL_Event *e, int *out_next_page) {
         }
     } else {
         // clicked elsewhere -> stop text input
-        if (identificador_active || filepath_active) SDL_StopTextInput();
+        if (identificador_active || filepath_active || mode_active) SDL_StopTextInput();
         identificador_active = false;
         filepath_active = false;
+        mode_active = false;
     }
 
     // number up/down
     if (pt_in_rect(mx,my,&up)) { cantidad++; if (cantidad>1000) cantidad=1000; }
     if (pt_in_rect(mx,my,&down)) { cantidad--; if (cantidad<0) cantidad=0; }
 
-        // dropdown click
-        SDL_Rect droprect = dropdown_rect;
-        if (pt_in_rect(mx,my,&droprect)) {
-            dropdown_open = !dropdown_open;
-        } else if (dropdown_open) {
-            // check options area
-            SDL_Rect opts = {droprect.x, droprect.y + droprect.h, droprect.w, (int)(sizeof(ciphers)/sizeof(*ciphers)) * droprect.h};
-            if (pt_in_rect(mx,my,&opts)) {
-                int idx = (my - opts.y) / droprect.h;
-                if (idx >= 0 && idx < (int)(sizeof(ciphers)/sizeof(*ciphers))) cipher_selected = idx;
-            }
-            dropdown_open = false;
-        }
+        // sin dropdown: no acción adicional aquí
 
         // (handled above) filepath box click -> focus
     } else if (e->type == SDL_TEXTINPUT) {
         if (identificador_active) {
             strncat(identificador, e->text.text, MAX_TEXT - strlen(identificador) - 1);
+        } else if (mode_active) {
+            // Solo aceptar '0' o '1' y limitar a 9 dígitos
+            const char *txt = e->text.text;
+            for (size_t i=0; txt[i] != '\0'; ++i) {
+                if ((txt[i] == '0' || txt[i] == '1') && strlen(mode_text) < 9) {
+                    size_t L = strlen(mode_text);
+                    mode_text[L] = txt[i];
+                    mode_text[L+1] = '\0';
+                }
+            }
         }
     } else if (e->type == SDL_KEYDOWN) {
         if (identificador_active) {
             if (e->key.keysym.sym == SDLK_BACKSPACE && strlen(identificador)>0) {
                 identificador[strlen(identificador)-1] = '\0';
+            }
+        } else if (mode_active) {
+            if (e->key.keysym.sym == SDLK_BACKSPACE && strlen(mode_text)>0) {
+                mode_text[strlen(mode_text)-1] = '\0';
             }
         } else if (filepath_active) {
             if (e->key.keysym.sym == SDLK_BACKSPACE && strlen(filepath)>0) {
@@ -164,7 +180,8 @@ void page_one_render(SDL_Renderer *ren, TTF_Font *font) {
     SDL_Rect cantidad_box = {120,210,520,50};
     SDL_Rect up = {660,210,30,30};
     SDL_Rect down = {660,250,30,30};
-    dropdown_rect.x = 120; dropdown_rect.y = 280; dropdown_rect.w = 300; dropdown_rect.h = 30;
+    // Posicionar campo de modo
+    mode_rect.x = 120; mode_rect.y = 280; mode_rect.w = 300; mode_rect.h = 30;
     SDL_Rect fp_label = {120,460,300,20};
     SDL_Rect fpbox = {120,490,480,30};
     continue_btn.x = 120; continue_btn.y = 540; continue_btn.w = 160; continue_btn.h = 50;
@@ -270,43 +287,26 @@ void page_one_render(SDL_Renderer *ren, TTF_Font *font) {
             SDL_FreeSurface(arr_up); SDL_FreeSurface(arr_down);
         }
 
-        // dropdown label
-        SDL_Surface *lab3 = TTF_RenderUTF8_Blended(font, "Selecciona cifrado para textos", col);
+    // Etiqueta de clave de 9 bits
+    SDL_Surface *lab3 = TTF_RenderUTF8_Blended(font, "Clave de 9 bits (solo 0 y 1)", col);
         SDL_Texture *tlab3 = SDL_CreateTextureFromSurface(ren, lab3);
         SDL_QueryTexture(tlab3, NULL, NULL, &tw, &th);
-        SDL_Rect d3 = { dropdown_rect.x, dropdown_rect.y - 22, tw, th };
+        SDL_Rect d3 = { mode_rect.x, mode_rect.y - 22, tw, th };
         SDL_RenderCopy(ren, tlab3, NULL, &d3);
         SDL_DestroyTexture(tlab3); SDL_FreeSurface(lab3);
-
-    // dropdown box
-    SDL_SetRenderDrawColor(ren, 255,255,255,255);
-    SDL_RenderFillRect(ren, &dropdown_rect);
-    SDL_SetRenderDrawColor(ren, 200,200,200,255);
-    SDL_RenderDrawRect(ren, &dropdown_rect);
-
-        // selected text
-        SDL_Surface *sel = TTF_RenderUTF8_Blended(font, ciphers[cipher_selected], col);
-        SDL_Texture *tsel = SDL_CreateTextureFromSurface(ren, sel);
-        SDL_QueryTexture(tsel, NULL, NULL, &tw, &th);
-        SDL_Rect dsel = { dropdown_rect.x + 6, dropdown_rect.y + (dropdown_rect.h - th)/2, tw, th };
-        SDL_RenderCopy(ren, tsel, NULL, &dsel);
-        SDL_DestroyTexture(tsel); SDL_FreeSurface(sel);
-
-        // dropdown open options
-        if (dropdown_open) {
-            SDL_Rect opts = {dropdown_rect.x, dropdown_rect.y + dropdown_rect.h, dropdown_rect.w, (int)(sizeof(ciphers)/sizeof(*ciphers)) * dropdown_rect.h};
-            SDL_SetRenderDrawColor(ren, 250,250,250,255);
-            SDL_RenderFillRect(ren, &opts);
-            SDL_SetRenderDrawColor(ren, 180,180,180,255);
-            SDL_RenderDrawRect(ren, &opts);
-            for (int i=0;i<5;i++) {
-                SDL_Surface *o = TTF_RenderUTF8_Blended(font, ciphers[i], col);
-                SDL_Texture *to = SDL_CreateTextureFromSurface(ren, o);
-                SDL_QueryTexture(to, NULL, NULL, &tw, &th);
-                SDL_Rect od = { opts.x + 6, opts.y + i*dropdown_rect.h + (dropdown_rect.h - th)/2, tw, th };
-                SDL_RenderCopy(ren, to, NULL, &od);
-                SDL_DestroyTexture(to); SDL_FreeSurface(o);
-            }
+        // Caja de texto de modo
+        SDL_SetRenderDrawColor(ren, 255,255,255,255);
+        SDL_RenderFillRect(ren, &mode_rect);
+        if (mode_active) SDL_SetRenderDrawColor(ren, 30,144,255,255); else SDL_SetRenderDrawColor(ren, 200,200,200,255);
+        SDL_RenderDrawRect(ren, &mode_rect);
+        // Render contenido
+        if (strlen(mode_text) > 0) {
+            SDL_Surface *sel = TTF_RenderUTF8_Blended(font, mode_text, col);
+            SDL_Texture *tsel = SDL_CreateTextureFromSurface(ren, sel);
+            SDL_QueryTexture(tsel, NULL, NULL, &tw, &th);
+            SDL_Rect dsel = { mode_rect.x + 6, mode_rect.y + (mode_rect.h - th)/2, tw, th };
+            SDL_RenderCopy(ren, tsel, NULL, &dsel);
+            SDL_DestroyTexture(tsel); SDL_FreeSurface(sel);
         }
 
         // file selector label and box

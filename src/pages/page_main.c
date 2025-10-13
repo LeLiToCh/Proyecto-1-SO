@@ -3,6 +3,7 @@
 
 // We'll compute button positions based on renderer viewport to center them
 static SDL_Rect btn1, btn2;
+static const char* g_execution_mode = ""; // "Automatico" o "Manual"
 
 static void compute_layout(SDL_Renderer *ren) {
     int w, h;
@@ -23,9 +24,11 @@ void page_main_handle_event(SDL_Event *e, SDL_Renderer *ren, int *out_next_page)
         int mx = e->button.x;
         int my = e->button.y;
         if (mx >= btn1.x && mx <= btn1.x + btn1.w && my >= btn1.y && my <= btn1.y + btn1.h) {
-            *out_next_page = 1; // both buttons go to PAGE_ONE (Inicializador)
+            g_execution_mode = "Automatico";
+            *out_next_page = 1; // Ir a PAGE_ONE (Inicializador)
         } else if (mx >= btn2.x && mx <= btn2.x + btn2.w && my >= btn2.y && my <= btn2.y + btn2.h) {
-            *out_next_page = 1; // also PAGE_ONE
+            g_execution_mode = "Manual";
+            *out_next_page = 1; // Ir a PAGE_ONE
         }
     }
 }
@@ -113,4 +116,8 @@ void page_main_render(SDL_Renderer *ren, TTF_Font *font) {
         if (sm) SDL_FreeSurface(sm);
         if (sm_sh) SDL_FreeSurface(sm_sh);
     }
+}
+
+const char* page_main_get_execution_mode(void) {
+    return g_execution_mode && g_execution_mode[0] ? g_execution_mode : "Automatico"; // default
 }

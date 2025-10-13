@@ -52,10 +52,10 @@ RM = C:\msys64\mingw64\bin\cmake.exe -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "C:\Users\Emmanuel Chavarría\Documents\GitHub\Proyecto-1-SO"
+CMAKE_SOURCE_DIR = C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "C:\Users\Emmanuel Chavarría\Documents\GitHub\Proyecto-1-SO\build"
+CMAKE_BINARY_DIR = C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO\build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/sdl_app.dir/depend.make
@@ -73,63 +73,63 @@ CMakeFiles/sdl_app.dir/codegen:
 
 CMakeFiles/sdl_app.dir/src/main.c.obj: CMakeFiles/sdl_app.dir/flags.make
 CMakeFiles/sdl_app.dir/src/main.c.obj: CMakeFiles/sdl_app.dir/includes_C.rsp
-CMakeFiles/sdl_app.dir/src/main.c.obj: C:/Users/Emmanuel\ Chavarría/Documents/GitHub/Proyecto-1-SO/src/main.c
+CMakeFiles/sdl_app.dir/src/main.c.obj: C:/Users/EMMANU~1/Documents/GitHub/Proyecto-1-SO/src/main.c
 CMakeFiles/sdl_app.dir/src/main.c.obj: CMakeFiles/sdl_app.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="C:\Users\Emmanuel Chavarría\Documents\GitHub\Proyecto-1-SO\build\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/sdl_app.dir/src/main.c.obj"
-	C:\msys64\mingw64\bin\cc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/sdl_app.dir/src/main.c.obj -MF CMakeFiles\sdl_app.dir\src\main.c.obj.d -o CMakeFiles\sdl_app.dir\src\main.c.obj -c "C:\Users\Emmanuel Chavarría\Documents\GitHub\Proyecto-1-SO\src\main.c"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/sdl_app.dir/src/main.c.obj"
+	C:\msys64\mingw64\bin\cc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/sdl_app.dir/src/main.c.obj -MF CMakeFiles\sdl_app.dir\src\main.c.obj.d -o CMakeFiles\sdl_app.dir\src\main.c.obj -c C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO\src\main.c
 
 CMakeFiles/sdl_app.dir/src/main.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/sdl_app.dir/src/main.c.i"
-	C:\msys64\mingw64\bin\cc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "C:\Users\Emmanuel Chavarría\Documents\GitHub\Proyecto-1-SO\src\main.c" > CMakeFiles\sdl_app.dir\src\main.c.i
+	C:\msys64\mingw64\bin\cc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO\src\main.c > CMakeFiles\sdl_app.dir\src\main.c.i
 
 CMakeFiles/sdl_app.dir/src/main.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/sdl_app.dir/src/main.c.s"
-	C:\msys64\mingw64\bin\cc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "C:\Users\Emmanuel Chavarría\Documents\GitHub\Proyecto-1-SO\src\main.c" -o CMakeFiles\sdl_app.dir\src\main.c.s
+	C:\msys64\mingw64\bin\cc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO\src\main.c -o CMakeFiles\sdl_app.dir\src\main.c.s
 
 CMakeFiles/sdl_app.dir/src/pages/page_main.c.obj: CMakeFiles/sdl_app.dir/flags.make
 CMakeFiles/sdl_app.dir/src/pages/page_main.c.obj: CMakeFiles/sdl_app.dir/includes_C.rsp
-CMakeFiles/sdl_app.dir/src/pages/page_main.c.obj: C:/Users/Emmanuel\ Chavarría/Documents/GitHub/Proyecto-1-SO/src/pages/page_main.c
+CMakeFiles/sdl_app.dir/src/pages/page_main.c.obj: C:/Users/EMMANU~1/Documents/GitHub/Proyecto-1-SO/src/pages/page_main.c
 CMakeFiles/sdl_app.dir/src/pages/page_main.c.obj: CMakeFiles/sdl_app.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="C:\Users\Emmanuel Chavarría\Documents\GitHub\Proyecto-1-SO\build\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/sdl_app.dir/src/pages/page_main.c.obj"
-	C:\msys64\mingw64\bin\cc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/sdl_app.dir/src/pages/page_main.c.obj -MF CMakeFiles\sdl_app.dir\src\pages\page_main.c.obj.d -o CMakeFiles\sdl_app.dir\src\pages\page_main.c.obj -c "C:\Users\Emmanuel Chavarría\Documents\GitHub\Proyecto-1-SO\src\pages\page_main.c"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/sdl_app.dir/src/pages/page_main.c.obj"
+	C:\msys64\mingw64\bin\cc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/sdl_app.dir/src/pages/page_main.c.obj -MF CMakeFiles\sdl_app.dir\src\pages\page_main.c.obj.d -o CMakeFiles\sdl_app.dir\src\pages\page_main.c.obj -c C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO\src\pages\page_main.c
 
 CMakeFiles/sdl_app.dir/src/pages/page_main.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/sdl_app.dir/src/pages/page_main.c.i"
-	C:\msys64\mingw64\bin\cc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "C:\Users\Emmanuel Chavarría\Documents\GitHub\Proyecto-1-SO\src\pages\page_main.c" > CMakeFiles\sdl_app.dir\src\pages\page_main.c.i
+	C:\msys64\mingw64\bin\cc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO\src\pages\page_main.c > CMakeFiles\sdl_app.dir\src\pages\page_main.c.i
 
 CMakeFiles/sdl_app.dir/src/pages/page_main.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/sdl_app.dir/src/pages/page_main.c.s"
-	C:\msys64\mingw64\bin\cc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "C:\Users\Emmanuel Chavarría\Documents\GitHub\Proyecto-1-SO\src\pages\page_main.c" -o CMakeFiles\sdl_app.dir\src\pages\page_main.c.s
+	C:\msys64\mingw64\bin\cc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO\src\pages\page_main.c -o CMakeFiles\sdl_app.dir\src\pages\page_main.c.s
 
 CMakeFiles/sdl_app.dir/src/pages/page_one.c.obj: CMakeFiles/sdl_app.dir/flags.make
 CMakeFiles/sdl_app.dir/src/pages/page_one.c.obj: CMakeFiles/sdl_app.dir/includes_C.rsp
-CMakeFiles/sdl_app.dir/src/pages/page_one.c.obj: C:/Users/Emmanuel\ Chavarría/Documents/GitHub/Proyecto-1-SO/src/pages/page_one.c
+CMakeFiles/sdl_app.dir/src/pages/page_one.c.obj: C:/Users/EMMANU~1/Documents/GitHub/Proyecto-1-SO/src/pages/page_one.c
 CMakeFiles/sdl_app.dir/src/pages/page_one.c.obj: CMakeFiles/sdl_app.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="C:\Users\Emmanuel Chavarría\Documents\GitHub\Proyecto-1-SO\build\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/sdl_app.dir/src/pages/page_one.c.obj"
-	C:\msys64\mingw64\bin\cc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/sdl_app.dir/src/pages/page_one.c.obj -MF CMakeFiles\sdl_app.dir\src\pages\page_one.c.obj.d -o CMakeFiles\sdl_app.dir\src\pages\page_one.c.obj -c "C:\Users\Emmanuel Chavarría\Documents\GitHub\Proyecto-1-SO\src\pages\page_one.c"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/sdl_app.dir/src/pages/page_one.c.obj"
+	C:\msys64\mingw64\bin\cc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/sdl_app.dir/src/pages/page_one.c.obj -MF CMakeFiles\sdl_app.dir\src\pages\page_one.c.obj.d -o CMakeFiles\sdl_app.dir\src\pages\page_one.c.obj -c C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO\src\pages\page_one.c
 
 CMakeFiles/sdl_app.dir/src/pages/page_one.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/sdl_app.dir/src/pages/page_one.c.i"
-	C:\msys64\mingw64\bin\cc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "C:\Users\Emmanuel Chavarría\Documents\GitHub\Proyecto-1-SO\src\pages\page_one.c" > CMakeFiles\sdl_app.dir\src\pages\page_one.c.i
+	C:\msys64\mingw64\bin\cc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO\src\pages\page_one.c > CMakeFiles\sdl_app.dir\src\pages\page_one.c.i
 
 CMakeFiles/sdl_app.dir/src/pages/page_one.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/sdl_app.dir/src/pages/page_one.c.s"
-	C:\msys64\mingw64\bin\cc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "C:\Users\Emmanuel Chavarría\Documents\GitHub\Proyecto-1-SO\src\pages\page_one.c" -o CMakeFiles\sdl_app.dir\src\pages\page_one.c.s
+	C:\msys64\mingw64\bin\cc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO\src\pages\page_one.c -o CMakeFiles\sdl_app.dir\src\pages\page_one.c.s
 
 CMakeFiles/sdl_app.dir/src/pages/page_two.c.obj: CMakeFiles/sdl_app.dir/flags.make
 CMakeFiles/sdl_app.dir/src/pages/page_two.c.obj: CMakeFiles/sdl_app.dir/includes_C.rsp
-CMakeFiles/sdl_app.dir/src/pages/page_two.c.obj: C:/Users/Emmanuel\ Chavarría/Documents/GitHub/Proyecto-1-SO/src/pages/page_two.c
+CMakeFiles/sdl_app.dir/src/pages/page_two.c.obj: C:/Users/EMMANU~1/Documents/GitHub/Proyecto-1-SO/src/pages/page_two.c
 CMakeFiles/sdl_app.dir/src/pages/page_two.c.obj: CMakeFiles/sdl_app.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="C:\Users\Emmanuel Chavarría\Documents\GitHub\Proyecto-1-SO\build\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/sdl_app.dir/src/pages/page_two.c.obj"
-	C:\msys64\mingw64\bin\cc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/sdl_app.dir/src/pages/page_two.c.obj -MF CMakeFiles\sdl_app.dir\src\pages\page_two.c.obj.d -o CMakeFiles\sdl_app.dir\src\pages\page_two.c.obj -c "C:\Users\Emmanuel Chavarría\Documents\GitHub\Proyecto-1-SO\src\pages\page_two.c"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/sdl_app.dir/src/pages/page_two.c.obj"
+	C:\msys64\mingw64\bin\cc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/sdl_app.dir/src/pages/page_two.c.obj -MF CMakeFiles\sdl_app.dir\src\pages\page_two.c.obj.d -o CMakeFiles\sdl_app.dir\src\pages\page_two.c.obj -c C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO\src\pages\page_two.c
 
 CMakeFiles/sdl_app.dir/src/pages/page_two.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/sdl_app.dir/src/pages/page_two.c.i"
-	C:\msys64\mingw64\bin\cc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "C:\Users\Emmanuel Chavarría\Documents\GitHub\Proyecto-1-SO\src\pages\page_two.c" > CMakeFiles\sdl_app.dir\src\pages\page_two.c.i
+	C:\msys64\mingw64\bin\cc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO\src\pages\page_two.c > CMakeFiles\sdl_app.dir\src\pages\page_two.c.i
 
 CMakeFiles/sdl_app.dir/src/pages/page_two.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/sdl_app.dir/src/pages/page_two.c.s"
-	C:\msys64\mingw64\bin\cc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "C:\Users\Emmanuel Chavarría\Documents\GitHub\Proyecto-1-SO\src\pages\page_two.c" -o CMakeFiles\sdl_app.dir\src\pages\page_two.c.s
+	C:\msys64\mingw64\bin\cc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO\src\pages\page_two.c -o CMakeFiles\sdl_app.dir\src\pages\page_two.c.s
 
 # Object files for target sdl_app
 sdl_app_OBJECTS = \
@@ -149,9 +149,9 @@ sdl_app.exe: CMakeFiles/sdl_app.dir/build.make
 sdl_app.exe: CMakeFiles/sdl_app.dir/linkLibs.rsp
 sdl_app.exe: CMakeFiles/sdl_app.dir/objects1.rsp
 sdl_app.exe: CMakeFiles/sdl_app.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir="C:\Users\Emmanuel Chavarría\Documents\GitHub\Proyecto-1-SO\build\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_5) "Linking C executable sdl_app.exe"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking C executable sdl_app.exe"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles\sdl_app.dir\link.txt --verbose=$(VERBOSE)
-	C:\msys64\mingw64\bin\cmake.exe -E copy_if_different "C:/Users/Emmanuel Chavarría/Documents/GitHub/Proyecto-1-SO/font.ttf" "C:/Users/Emmanuel Chavarría/Documents/GitHub/Proyecto-1-SO/build/font.ttf"
+	C:\msys64\mingw64\bin\cmake.exe -E copy_if_different C:/Users/EMMANU~1/Documents/GitHub/Proyecto-1-SO/font.ttf C:/Users/EMMANU~1/Documents/GitHub/Proyecto-1-SO/build/font.ttf
 
 # Rule to build all files generated by this target.
 CMakeFiles/sdl_app.dir/build: sdl_app.exe
@@ -162,6 +162,6 @@ CMakeFiles/sdl_app.dir/clean:
 .PHONY : CMakeFiles/sdl_app.dir/clean
 
 CMakeFiles/sdl_app.dir/depend:
-	$(CMAKE_COMMAND) -E cmake_depends "MinGW Makefiles" "C:\Users\Emmanuel Chavarría\Documents\GitHub\Proyecto-1-SO" "C:\Users\Emmanuel Chavarría\Documents\GitHub\Proyecto-1-SO" "C:\Users\Emmanuel Chavarría\Documents\GitHub\Proyecto-1-SO\build" "C:\Users\Emmanuel Chavarría\Documents\GitHub\Proyecto-1-SO\build" "C:\Users\Emmanuel Chavarría\Documents\GitHub\Proyecto-1-SO\build\CMakeFiles\sdl_app.dir\DependInfo.cmake" "--color=$(COLOR)"
+	$(CMAKE_COMMAND) -E cmake_depends "MinGW Makefiles" C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO\build C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO\build C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO\build\CMakeFiles\sdl_app.dir\DependInfo.cmake "--color=$(COLOR)"
 .PHONY : CMakeFiles/sdl_app.dir/depend
 
