@@ -6,6 +6,7 @@
 #include "pages/page_main.h"
 #include "pages/page_one.h"
 #include "pages/page_two.h"
+#include "memory.h"
 
 #define WINDOW_W 800
 #define WINDOW_H 600
@@ -86,6 +87,8 @@ int main(int argc, char **argv) {
     TTF_CloseFont(font);
     SDL_DestroyRenderer(ren);
     SDL_DestroyWindow(win);
+    // Release memory backend resources if initialized
+    memory_shutdown();
     TTF_Quit();
     SDL_Quit();
     return 0;

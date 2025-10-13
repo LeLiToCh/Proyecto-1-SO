@@ -2,6 +2,8 @@
 #include <stdbool.h>   // <-- debe ir PRIMERO de todo
 #include "page_one.h"
 #include "page_main.h" // para obtener modo seleccionado en pantalla principal
+#include "memory.h"    // backend de memoria
+#include "processor.h" // procesado de archivo a memoria
 #include <stdio.h>
 #include <string.h>
 #ifdef _WIN32
@@ -13,6 +15,7 @@
 // UI element rects
 static SDL_Rect back = {20,20,100,40};
 static SDL_Rect continue_btn = {0,0,160,50};
+static bool continue_disabled = false; // se deshabilita tras primera carga
 
 // Inputs state
 #define MAX_TEXT 256
@@ -27,6 +30,18 @@ static int cantidad = 1;
 static SDL_Rect mode_rect = {0,0,220,30};
 static char mode_text[16] = ""; // guardaremos cadena de hasta 9 dígitos
 static bool mode_active = false;
+
+static void reset_page_state(void) {
+    identificador[0] = '\0';
+    filepath[0] = '\0';
+    mode_text[0] = '\0';
+    cantidad = 1;
+    identificador_active = filepath_active = mode_active = false;
+    continue_disabled = false;
+    SDL_StopTextInput();
+    // Limpiar memoria para que no se guarde nada
+    memory_clear();
+}
 
 // helper: open native file dialog into out buffer (UTF-8). Returns 1 on success.
 static int open_file_dialog(char *out, size_t outlen) {
@@ -76,17 +91,29 @@ static bool pt_in_rect(int x, int y, SDL_Rect *r) {
 
 void page_one_handle_event(SDL_Event *e, int *out_next_page) {
     if (e->type == SDL_MOUSEBUTTONDOWN && e->button.button == SDL_BUTTON_LEFT) {
+        // Asegurar que los rects dependientes del layout coincidan con el render
+        // para que el primer click funcione (evita tener que hacer doble click).
+        continue_btn.x = 120; continue_btn.y = 540; continue_btn.w = 160; continue_btn.h = 50;
         int mx = e->button.x;
         int my = e->button.y;
         if (pt_in_rect(mx,my,&back)) {
+            // Restablecer estado e ir a la pantalla principal
+            reset_page_state();
             *out_next_page = 0; // PAGE_MAIN
             return;
         }
 
-        if (pt_in_rect(mx,my,&continue_btn)) {
+        if (pt_in_rect(mx,my,&continue_btn) && !continue_disabled) {
             // print values to stdout
             printf("Identificador: %s\n", identificador);
             printf("Cantidad: %d\n", cantidad);
+         // Inicializar memoria compartida con 'identificador' y 'cantidad'
+         if (cantidad <= 0) cantidad = 1; // validar
+         bool created = false;
+         bool ok = memory_init_shared(identificador[0] ? identificador : "mem", (size_t)cantidad, &created);
+         printf("Memoria compartida %s (capacidad=%zu): %s\n",
+             created ? "creada" : "adjunta",
+             memory_capacity(), ok ? "OK" : "ERROR");
             // Imprimir modo desde la pantalla principal (botones)
             const char *exec_mode_main = page_main_get_execution_mode();
             printf("Modo de ejecucion (inicio): %s\n", exec_mode_main);
@@ -94,6 +121,17 @@ void page_one_handle_event(SDL_Event *e, int *out_next_page) {
             printf("Clave de 9 bits: %s\n", mode_text[0] ? mode_text : "(vacia)");
             printf("Archivo: %s\n", filepath);
             fflush(stdout);
+            // Invocar procesamiento según modo (Automatico/Manual)
+            bool automatic = true;
+            if (exec_mode_main && (strcmp(exec_mode_main, "Manual") == 0)) automatic = false;
+            if (filepath[0]) {
+                // Lanzar procesamiento en background para no bloquear la UI
+                processor_start_async(filepath, mode_text, automatic);
+            } else {
+                printf("[AVISO] No se selecciono archivo para procesar.\n");
+            }
+            // Deshabilitar el botón para evitar múltiples cargas
+            continue_disabled = true;
             return;
         }
 
@@ -344,7 +382,7 @@ void page_one_render(SDL_Renderer *ren, TTF_Font *font) {
     SDL_DestroyTexture(tsbtn); SDL_FreeSurface(sbtn);
 
         // Continue button
-        SDL_SetRenderDrawColor(ren, 34,139,34,255);
+    if (continue_disabled) SDL_SetRenderDrawColor(ren, 120,120,120,255); else SDL_SetRenderDrawColor(ren, 34,139,34,255);
         SDL_RenderFillRect(ren, &continue_btn);
         SDL_SetRenderDrawColor(ren, 255,255,255,255);
         SDL_Surface *cont = TTF_RenderUTF8_Blended(font, "Continuar", (SDL_Color){255,255,255,255});

@@ -77,6 +77,8 @@ endif()
 # Sources
 set(SOURCE_FILES
   src/main.c
+  src/memory.c
+  src/processor.c
   src/pages/page_main.c
   src/pages/page_one.c
   src/pages/page_two.c

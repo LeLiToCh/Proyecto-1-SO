@@ -902,6 +902,18 @@
 			"value" : "C:/msys64/mingw64/share/cmake"
 		},
 		{
+			"name" : "CMAKE_SH",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "No help, variable specified on the command line."
+				}
+			],
+			"type" : "UNINITIALIZED",
+			"value" : "CMAKE_SH-NOTFOUND"
+		},
+		{
 			"name" : "CMAKE_SHARED_LINKER_FLAGS",
 			"properties" : 
 			[

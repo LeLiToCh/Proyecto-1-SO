@@ -152,6 +152,30 @@ src/main.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/main.c.s
 .PHONY : src/main.c.s
 
+src/memory.obj: src/memory.c.obj
+.PHONY : src/memory.obj
+
+# target to build an object file
+src/memory.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/memory.c.obj
+.PHONY : src/memory.c.obj
+
+src/memory.i: src/memory.c.i
+.PHONY : src/memory.i
+
+# target to preprocess a source file
+src/memory.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/memory.c.i
+.PHONY : src/memory.c.i
+
+src/memory.s: src/memory.c.s
+.PHONY : src/memory.s
+
+# target to generate assembly for a file
+src/memory.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/memory.c.s
+.PHONY : src/memory.c.s
+
 src/pages/page_main.obj: src/pages/page_main.c.obj
 .PHONY : src/pages/page_main.obj
 
@@ -224,6 +248,30 @@ src/pages/page_two.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/page_two.c.s
 .PHONY : src/pages/page_two.c.s
 
+src/processor.obj: src/processor.c.obj
+.PHONY : src/processor.obj
+
+# target to build an object file
+src/processor.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/processor.c.obj
+.PHONY : src/processor.c.obj
+
+src/processor.i: src/processor.c.i
+.PHONY : src/processor.i
+
+# target to preprocess a source file
+src/processor.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/processor.c.i
+.PHONY : src/processor.c.i
+
+src/processor.s: src/processor.c.s
+.PHONY : src/processor.s
+
+# target to generate assembly for a file
+src/processor.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/processor.c.s
+.PHONY : src/processor.c.s
+
 # Help Target
 help:
 	@echo The following are some of the valid targets for this Makefile:
@@ -236,6 +284,9 @@ help:
 	@echo ... src/main.obj
 	@echo ... src/main.i
 	@echo ... src/main.s
+	@echo ... src/memory.obj
+	@echo ... src/memory.i
+	@echo ... src/memory.s
 	@echo ... src/pages/page_main.obj
 	@echo ... src/pages/page_main.i
 	@echo ... src/pages/page_main.s
@@ -245,6 +296,9 @@ help:
 	@echo ... src/pages/page_two.obj
 	@echo ... src/pages/page_two.i
 	@echo ... src/pages/page_two.s
+	@echo ... src/processor.obj
+	@echo ... src/processor.i
+	@echo ... src/processor.s
 .PHONY : help
 
 
