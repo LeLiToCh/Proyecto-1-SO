@@ -1,4 +1,6 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/sdl_app.dir/src/app_state.c.obj"
+  "CMakeFiles/sdl_app.dir/src/app_state.c.obj.d"
   "CMakeFiles/sdl_app.dir/src/main.c.obj"
   "CMakeFiles/sdl_app.dir/src/main.c.obj.d"
   "CMakeFiles/sdl_app.dir/src/memory.c.obj"
@@ -7,6 +9,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/sdl_app.dir/src/pages/page_main.c.obj.d"
   "CMakeFiles/sdl_app.dir/src/pages/page_one.c.obj"
   "CMakeFiles/sdl_app.dir/src/pages/page_one.c.obj.d"
+  "CMakeFiles/sdl_app.dir/src/pages/page_sender.c.obj"
+  "CMakeFiles/sdl_app.dir/src/pages/page_sender.c.obj.d"
   "CMakeFiles/sdl_app.dir/src/pages/page_two.c.obj"
   "CMakeFiles/sdl_app.dir/src/pages/page_two.c.obj.d"
   "CMakeFiles/sdl_app.dir/src/processor.c.obj"

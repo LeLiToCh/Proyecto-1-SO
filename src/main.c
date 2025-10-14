@@ -6,12 +6,13 @@
 #include "pages/page_main.h"
 #include "pages/page_one.h"
 #include "pages/page_two.h"
+#include "pages/page_sender.h"
 #include "memory.h"
 
 #define WINDOW_W 800
 #define WINDOW_H 600
 
-typedef enum { PAGE_MAIN, PAGE_ONE, PAGE_TWO } Page;
+typedef enum { PAGE_MAIN, PAGE_ONE, PAGE_TWO, PAGE_SENDER } Page;
 
 int main(int argc, char **argv) {
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -64,6 +65,7 @@ int main(int argc, char **argv) {
                 if (page == PAGE_MAIN) page_main_handle_event(&e, ren, &next);
                 else if (page == PAGE_ONE) page_one_handle_event(&e, &next);
                 else if (page == PAGE_TWO) page_two_handle_event(&e, &next);
+                else if (page == PAGE_SENDER) page_sender_handle_event(&e, &next);
                 if (next >= 0) page = (Page)next;
             }
         }
@@ -78,6 +80,8 @@ int main(int argc, char **argv) {
             page_one_render(ren, font);
         } else if (page == PAGE_TWO) {
             page_two_render(ren, font);
+        } else if (page == PAGE_SENDER) {
+            page_sender_render(ren, font);
         }
 
         SDL_RenderPresent(ren);

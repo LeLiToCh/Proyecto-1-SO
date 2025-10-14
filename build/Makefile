@@ -128,6 +128,30 @@ sdl_app/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/build
 .PHONY : sdl_app/fast
 
+src/app_state.obj: src/app_state.c.obj
+.PHONY : src/app_state.obj
+
+# target to build an object file
+src/app_state.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/app_state.c.obj
+.PHONY : src/app_state.c.obj
+
+src/app_state.i: src/app_state.c.i
+.PHONY : src/app_state.i
+
+# target to preprocess a source file
+src/app_state.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/app_state.c.i
+.PHONY : src/app_state.c.i
+
+src/app_state.s: src/app_state.c.s
+.PHONY : src/app_state.s
+
+# target to generate assembly for a file
+src/app_state.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/app_state.c.s
+.PHONY : src/app_state.c.s
+
 src/main.obj: src/main.c.obj
 .PHONY : src/main.obj
 
@@ -224,6 +248,30 @@ src/pages/page_one.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/page_one.c.s
 .PHONY : src/pages/page_one.c.s
 
+src/pages/page_sender.obj: src/pages/page_sender.c.obj
+.PHONY : src/pages/page_sender.obj
+
+# target to build an object file
+src/pages/page_sender.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/page_sender.c.obj
+.PHONY : src/pages/page_sender.c.obj
+
+src/pages/page_sender.i: src/pages/page_sender.c.i
+.PHONY : src/pages/page_sender.i
+
+# target to preprocess a source file
+src/pages/page_sender.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/page_sender.c.i
+.PHONY : src/pages/page_sender.c.i
+
+src/pages/page_sender.s: src/pages/page_sender.c.s
+.PHONY : src/pages/page_sender.s
+
+# target to generate assembly for a file
+src/pages/page_sender.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/page_sender.c.s
+.PHONY : src/pages/page_sender.c.s
+
 src/pages/page_two.obj: src/pages/page_two.c.obj
 .PHONY : src/pages/page_two.obj
 
@@ -281,6 +329,9 @@ help:
 	@echo ... edit_cache
 	@echo ... rebuild_cache
 	@echo ... sdl_app
+	@echo ... src/app_state.obj
+	@echo ... src/app_state.i
+	@echo ... src/app_state.s
 	@echo ... src/main.obj
 	@echo ... src/main.i
 	@echo ... src/main.s
@@ -293,6 +344,9 @@ help:
 	@echo ... src/pages/page_one.obj
 	@echo ... src/pages/page_one.i
 	@echo ... src/pages/page_one.s
+	@echo ... src/pages/page_sender.obj
+	@echo ... src/pages/page_sender.i
+	@echo ... src/pages/page_sender.s
 	@echo ... src/pages/page_two.obj
 	@echo ... src/pages/page_two.i
 	@echo ... src/pages/page_two.s

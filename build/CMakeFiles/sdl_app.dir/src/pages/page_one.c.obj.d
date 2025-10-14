@@ -217,6 +217,7 @@ CMakeFiles/sdl_app.dir/src/pages/page_one.c.obj: \
  C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO\src\pages\page_main.h \
  C:/Users/EMMANU~1/Documents/GitHub/Proyecto-1-SO/src/memory.h \
  C:/Users/EMMANU~1/Documents/GitHub/Proyecto-1-SO/src/processor.h \
+ C:/Users/EMMANU~1/Documents/GitHub/Proyecto-1-SO/src/app_state.h \
  C:/msys64/mingw64/include/windows.h \
  C:/msys64/mingw64/include/sdkddkver.h C:/msys64/mingw64/include/excpt.h \
  C:/msys64/mingw64/include/windef.h \

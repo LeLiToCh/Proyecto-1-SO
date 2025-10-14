@@ -4,6 +4,7 @@
 #include "page_main.h" // para obtener modo seleccionado en pantalla principal
 #include "memory.h"    // backend de memoria
 #include "processor.h" // procesado de archivo a memoria
+#include "app_state.h"
 #include <stdio.h>
 #include <string.h>
 #ifdef _WIN32
@@ -103,7 +104,7 @@ void page_one_handle_event(SDL_Event *e, int *out_next_page) {
             return;
         }
 
-        if (pt_in_rect(mx,my,&continue_btn) && !continue_disabled) {
+    if (pt_in_rect(mx,my,&continue_btn) && !continue_disabled) {
             // print values to stdout
             printf("Identificador: %s\n", identificador);
             printf("Cantidad: %d\n", cantidad);
@@ -121,16 +122,11 @@ void page_one_handle_event(SDL_Event *e, int *out_next_page) {
             printf("Clave de 9 bits: %s\n", mode_text[0] ? mode_text : "(vacia)");
             printf("Archivo: %s\n", filepath);
             fflush(stdout);
-            // Invocar procesamiento según modo (Automatico/Manual)
+            // Guardar estado para la página sender y cambiar a ella
             bool automatic = true;
             if (exec_mode_main && (strcmp(exec_mode_main, "Manual") == 0)) automatic = false;
-            if (filepath[0]) {
-                // Lanzar procesamiento en background para no bloquear la UI
-                processor_start_async(filepath, mode_text, automatic);
-            } else {
-                printf("[AVISO] No se selecciono archivo para procesar.\n");
-            }
-            // Deshabilitar el botón para evitar múltiples cargas
+            app_state_set(identificador, (size_t)cantidad, mode_text, automatic);
+            *out_next_page = 3; // PAGE_SENDER
             continue_disabled = true;
             return;
         }
@@ -140,8 +136,9 @@ void page_one_handle_event(SDL_Event *e, int *out_next_page) {
     /* cantidad_box unused in event handler; used in render */
     SDL_Rect up = {660,210,30,30};
     SDL_Rect down = {660,250,30,30};
-    SDL_Rect fpbox = {120,490,480,30};
-    SDL_Rect search_btn = { fpbox.x + fpbox.w + 8, fpbox.y, 80, fpbox.h };
+    // file selector moved to sender page
+    SDL_Rect fpbox = {0,0,0,0};
+    SDL_Rect search_btn = {0,0,0,0};
     // Campo de modo (coincidir con render)
     mode_rect.x = 120; mode_rect.y = 280; mode_rect.w = 300; mode_rect.h = 30;
     if (pt_in_rect(mx,my,&idbox)) {
@@ -155,14 +152,6 @@ void page_one_handle_event(SDL_Event *e, int *out_next_page) {
         identificador_active = false;
         filepath_active = false;
         SDL_StartTextInput();
-    } else if (pt_in_rect(mx,my,&fpbox) || pt_in_rect(mx,my,&search_btn)) {
-        // open native file dialog and fill filepath
-        char sel[MAX_TEXT] = "";
-        if (open_file_dialog(sel, sizeof(sel))) {
-            strncpy(filepath, sel, MAX_TEXT-1);
-            filepath[MAX_TEXT-1] = '\0';
-            filepath_active = true; // highlight newly selected file
-        }
     } else {
         // clicked elsewhere -> stop text input
         if (identificador_active || filepath_active || mode_active) SDL_StopTextInput();
@@ -347,39 +336,7 @@ void page_one_render(SDL_Renderer *ren, TTF_Font *font) {
             SDL_DestroyTexture(tsel); SDL_FreeSurface(sel);
         }
 
-        // file selector label and box
-        SDL_Surface *flab = TTF_RenderUTF8_Blended(font, "Selecciona tu archivo para procesar", col);
-        SDL_Texture *tflab = SDL_CreateTextureFromSurface(ren, flab);
-        SDL_QueryTexture(tflab, NULL, NULL, &tw, &th);
-        SDL_Rect d4 = { fp_label.x, fp_label.y, tw, th };
-        SDL_RenderCopy(ren, tflab, NULL, &d4);
-        SDL_DestroyTexture(tflab); SDL_FreeSurface(flab);
-
-    SDL_SetRenderDrawColor(ren, 255,255,255,255);
-    SDL_RenderFillRect(ren, &fpbox);
-    // highlight file box if active
-    if (filepath_active) SDL_SetRenderDrawColor(ren, 30,144,255,255); else SDL_SetRenderDrawColor(ren, 200,200,200,255);
-    SDL_RenderDrawRect(ren, &fpbox);
-    // draw search button
-    SDL_Rect search_btn = { fpbox.x + fpbox.w + 8, fpbox.y, 80, fpbox.h };
-    SDL_SetRenderDrawColor(ren, 100,149,237,255);
-    SDL_RenderFillRect(ren, &search_btn);
-    if (strlen(filepath)>0) {
-        SDL_Surface *fp = TTF_RenderUTF8_Blended(font, filepath, col);
-        SDL_Texture *tfp = SDL_CreateTextureFromSurface(ren, fp);
-        SDL_QueryTexture(tfp, NULL, NULL, &tw, &th);
-        // clip text if too long (just render start)
-        SDL_Rect dfp = { fpbox.x + 6, fpbox.y + (fpbox.h - th)/2, tw, th };
-        SDL_RenderCopy(ren, tfp, NULL, &dfp);
-        SDL_DestroyTexture(tfp); SDL_FreeSurface(fp);
-    }
-    // search button label
-    SDL_Surface *sbtn = TTF_RenderUTF8_Blended(font, "Buscar", (SDL_Color){255,255,255,255});
-    SDL_Texture *tsbtn = SDL_CreateTextureFromSurface(ren, sbtn);
-    SDL_QueryTexture(tsbtn, NULL, NULL, &tw, &th);
-    SDL_Rect ds = { search_btn.x + (search_btn.w - tw)/2, search_btn.y + (search_btn.h - th)/2, tw, th };
-    SDL_RenderCopy(ren, tsbtn, NULL, &ds);
-    SDL_DestroyTexture(tsbtn); SDL_FreeSurface(sbtn);
+        // file selector moved to sender page (removed from here)
 
         // Continue button
     if (continue_disabled) SDL_SetRenderDrawColor(ren, 120,120,120,255); else SDL_SetRenderDrawColor(ren, 34,139,34,255);
