@@ -75,6 +75,7 @@ if(NOT SDL2_LIBRARIES OR NOT SDL2_TTF_LIBRARIES)
 endif()
 
 # Sources
+
 set(SOURCE_FILES
   src/main.c
   src/memory.c
@@ -83,6 +84,7 @@ set(SOURCE_FILES
   src/pages/page_one.c
   src/pages/page_two.c
   src/pages/page_sender.c
+  src/pages/sender_window.c
   src/app_state.c
 )
 

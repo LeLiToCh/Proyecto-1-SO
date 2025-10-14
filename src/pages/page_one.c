@@ -160,9 +160,15 @@ void page_one_handle_event(SDL_Event *e, int *out_next_page) {
         mode_active = false;
     }
 
-    // number up/down
-    if (pt_in_rect(mx,my,&up)) { cantidad++; if (cantidad>1000) cantidad=1000; }
-    if (pt_in_rect(mx,my,&down)) { cantidad--; if (cantidad<0) cantidad=0; }
+    // number up/down (change by 50)
+    if (pt_in_rect(mx,my,&up)) {
+        cantidad += 50;
+        if (cantidad > 1000000) cantidad = 1000000; // raise upper bound for convenience
+    }
+    if (pt_in_rect(mx,my,&down)) {
+        cantidad -= 50;
+        if (cantidad < 0) cantidad = 0;
+    }
 
         // sin dropdown: no acción adicional aquí
 

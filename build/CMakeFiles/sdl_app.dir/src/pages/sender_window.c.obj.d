@@ -1,6 +1,7 @@
-CMakeFiles/sdl_app.dir/src/pages/page_sender.c.obj: \
- C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO\src\pages\page_sender.c \
- C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO\src\pages\page_sender.h \
+CMakeFiles/sdl_app.dir/src/pages/sender_window.c.obj: \
+ C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO\src\pages\sender_window.c \
+ C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO\src\pages\sender_window.h \
+ C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/stdbool.h \
  C:/msys64/mingw64/include/SDL2/SDL.h \
  C:/msys64/mingw64/include/SDL2/SDL_main.h \
  C:/msys64/mingw64/include/SDL2/SDL_stdinc.h \
@@ -213,11 +214,7 @@ CMakeFiles/sdl_app.dir/src/pages/page_sender.c.obj: \
  C:/msys64/mingw64/include/SDL2/SDL_misc.h \
  C:/msys64/mingw64/include/SDL2/SDL_ttf.h \
  C:/msys64/mingw64/include/SDL2/SDL.h \
- C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO\src\pages\sender_window.h \
- C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/stdbool.h \
  C:/Users/EMMANU~1/Documents/GitHub/Proyecto-1-SO/src/processor.h \
- C:/Users/EMMANU~1/Documents/GitHub/Proyecto-1-SO/src/app_state.h \
- C:/Users/EMMANU~1/Documents/GitHub/Proyecto-1-SO/src/memory.h \
  C:/msys64/mingw64/include/windows.h \
  C:/msys64/mingw64/include/sdkddkver.h C:/msys64/mingw64/include/excpt.h \
  C:/msys64/mingw64/include/windef.h \
@@ -326,4 +323,5 @@ CMakeFiles/sdl_app.dir/src/pages/page_sender.c.obj: \
  C:/msys64/mingw64/include/commdlg.h C:/msys64/mingw64/include/stralign.h \
  C:/msys64/mingw64/include/sec_api/stralign_s.h \
  C:/msys64/mingw64/include/winsvc.h C:/msys64/mingw64/include/mcx.h \
- C:/msys64/mingw64/include/imm.h
+ C:/msys64/mingw64/include/imm.h \
+ C:/Users/EMMANU~1/Documents/GitHub/Proyecto-1-SO/src/memory.h

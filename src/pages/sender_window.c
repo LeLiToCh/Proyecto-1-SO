@@ -6,6 +6,7 @@
 #include "processor.h"
 #ifdef _WIN32
 #include <windows.h>
+#include "memory.h"
 #include <commdlg.h>
 #endif
 
@@ -13,9 +14,7 @@
 #include <stdio.h>
 #define MAX_PATH_LEN 512
 
-static char file_path[MAX_PATH_LEN] = "";
-static char clave_text[9] = "";
-static bool clave_active = false;
+static int g_instance_counter = 0;
 
 void sender_window_start_async(const char *identificador, int cantidad, const char *clave, bool automatic) {
     SDL_Window *win = SDL_CreateWindow("Emisor", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 600, 300, SDL_WINDOW_SHOWN);
@@ -23,10 +22,17 @@ void sender_window_start_async(const char *identificador, int cantidad, const ch
     TTF_Font *font = TTF_OpenFont("font.ttf", 20);
     if (!font) { printf("No se pudo cargar la fuente\n"); }
 
+    // Estado local por ventana (no compartido entre instancias)
+    char file_path[MAX_PATH_LEN]; file_path[0] = '\0';
+    char clave_text[9]; clave_text[0] = '\0';
+    bool clave_active = false;
+
     SDL_Rect clave_rect = {40, 40, 220, 40};
     SDL_Rect fpbox = {40, 100, 400, 40};
     SDL_Rect search_btn = {fpbox.x + fpbox.w + 10, fpbox.y, 80, fpbox.h};
     SDL_Rect process_btn = {200, 180, 160, 50};
+    SDL_Rect newinst_btn = {40, 240, 220, 40};
+    SDL_Rect close_btn = {300, 240, 220, 40};
 
     int running = 1;
     SDL_StartTextInput();
@@ -36,11 +42,18 @@ void sender_window_start_async(const char *identificador, int cantidad, const ch
             if (e.type == SDL_QUIT) running = 0;
             else if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT) {
                 int mx = e.button.x, my = e.button.y;
-                if (mx >= clave_rect.x && mx <= clave_rect.x + clave_rect.w && my >= clave_rect.y && my <= clave_rect.y + clave_rect.h) {
+                // Botón cerrar
+                if (mx >= close_btn.x && mx <= close_btn.x + close_btn.w && my >= close_btn.y && my <= close_btn.y + close_btn.h) {
+                    running = 0;
+                }
+                // Botón nueva instancia (compartir misma memoria, UI limpia)
+                else if (mx >= newinst_btn.x && mx <= newinst_btn.x + newinst_btn.w && my >= newinst_btn.y && my <= newinst_btn.y + newinst_btn.h) {
+                    (void)++g_instance_counter;
+                    sender_window_start_async(identificador, cantidad, NULL, automatic);
+                } else if (mx >= clave_rect.x && mx <= clave_rect.x + clave_rect.w && my >= clave_rect.y && my <= clave_rect.y + clave_rect.h) {
                     clave_active = true;
                     SDL_StartTextInput();
                 } else if (mx >= fpbox.x && mx <= fpbox.x + fpbox.w && my >= fpbox.y && my <= fpbox.y + fpbox.h) {
-                    // No text input for file path
                     clave_active = false;
                     SDL_StopTextInput();
                 } else if (mx >= search_btn.x && mx <= search_btn.x + search_btn.w && my >= search_btn.y && my <= search_btn.y + search_btn.h) {
@@ -73,9 +86,18 @@ void sender_window_start_async(const char *identificador, int cantidad, const ch
                     }
                     #endif
                 } else if (mx >= process_btn.x && mx <= process_btn.x + process_btn.w && my >= process_btn.y && my <= process_btn.y + process_btn.h) {
-                    // Procesar solo si clave válida y archivo seleccionado
-                    if (strlen(clave_text) == 8 && file_path[0]) {
-                        processor_start_async(file_path, clave_text, automatic);
+                    const char *key_to_use = (clave && strlen(clave) == 8) ? clave : clave_text;
+                    if (strlen(key_to_use) == 8 && file_path[0]) {
+                        bool created = false;
+                        const char *ident = (identificador && identificador[0]) ? identificador : "mem";
+                        if (cantidad == 0) cantidad = 1;
+                        bool ok = memory_init_shared(ident, cantidad, &created);
+                        printf("[window] Memoria compartida %s (capacidad=%zu): %s\n", created ? "creada" : "adjunta", memory_capacity(), ok ? "OK" : "ERROR");
+                        if (ok) {
+                            processor_start_async(file_path, key_to_use, automatic);
+                        } else {
+                            printf("[window] ERROR: no se pudo inicializar/adjuntar memoria compartida. Aborting procesamiento.\n");
+                        }
                     }
                 } else {
                     clave_active = false;
@@ -106,6 +128,29 @@ void sender_window_start_async(const char *identificador, int cantidad, const ch
             SDL_Texture *tlab = SDL_CreateTextureFromSurface(ren, lab);
             int tw, th; SDL_QueryTexture(tlab, NULL, NULL, &tw, &th);
             SDL_Rect d = { clave_rect.x, clave_rect.y - 22, tw, th };
+            SDL_RenderCopy(ren, tlab, NULL, &d);
+            SDL_DestroyTexture(tlab); SDL_FreeSurface(lab);
+        }
+        // Botón nueva instancia
+        SDL_SetRenderDrawColor(ren, 255, 140, 0, 255); // naranja
+        SDL_RenderFillRect(ren, &newinst_btn);
+        if (font) {
+            SDL_Surface *sni = TTF_RenderUTF8_Blended(font, "Nueva Instancia", (SDL_Color){255,255,255,255});
+            SDL_Texture *tni = SDL_CreateTextureFromSurface(ren, sni);
+            int tw, th; SDL_QueryTexture(tni, NULL, NULL, &tw, &th);
+            SDL_Rect d = { newinst_btn.x + (newinst_btn.w - tw)/2, newinst_btn.y + (newinst_btn.h - th)/2, tw, th };
+            SDL_RenderCopy(ren, tni, NULL, &d);
+            SDL_DestroyTexture(tni); SDL_FreeSurface(sni);
+        }
+        // Botón cerrar
+        SDL_SetRenderDrawColor(ren, 220, 20, 60, 255); // rojo
+        SDL_RenderFillRect(ren, &close_btn);
+        if (font) {
+            SDL_Color col = {255,255,255,255};
+            SDL_Surface *lab = TTF_RenderUTF8_Blended(font, "Cerrar", col);
+            SDL_Texture *tlab = SDL_CreateTextureFromSurface(ren, lab);
+            int tw, th; SDL_QueryTexture(tlab, NULL, NULL, &tw, &th);
+            SDL_Rect d = { close_btn.x + (close_btn.w - tw)/2, close_btn.y + (close_btn.h - th)/2, tw, th };
             SDL_RenderCopy(ren, tlab, NULL, &d);
             SDL_DestroyTexture(tlab); SDL_FreeSurface(lab);
         }

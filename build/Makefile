@@ -296,6 +296,30 @@ src/pages/page_two.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/page_two.c.s
 .PHONY : src/pages/page_two.c.s
 
+src/pages/sender_window.obj: src/pages/sender_window.c.obj
+.PHONY : src/pages/sender_window.obj
+
+# target to build an object file
+src/pages/sender_window.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/sender_window.c.obj
+.PHONY : src/pages/sender_window.c.obj
+
+src/pages/sender_window.i: src/pages/sender_window.c.i
+.PHONY : src/pages/sender_window.i
+
+# target to preprocess a source file
+src/pages/sender_window.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/sender_window.c.i
+.PHONY : src/pages/sender_window.c.i
+
+src/pages/sender_window.s: src/pages/sender_window.c.s
+.PHONY : src/pages/sender_window.s
+
+# target to generate assembly for a file
+src/pages/sender_window.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/sender_window.c.s
+.PHONY : src/pages/sender_window.c.s
+
 src/processor.obj: src/processor.c.obj
 .PHONY : src/processor.obj
 
@@ -350,6 +374,9 @@ help:
 	@echo ... src/pages/page_two.obj
 	@echo ... src/pages/page_two.i
 	@echo ... src/pages/page_two.s
+	@echo ... src/pages/sender_window.obj
+	@echo ... src/pages/sender_window.i
+	@echo ... src/pages/sender_window.s
 	@echo ... src/processor.obj
 	@echo ... src/processor.i
 	@echo ... src/processor.s

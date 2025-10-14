@@ -321,7 +321,7 @@ CMAKE_GENERATOR_PLATFORM:INTERNAL=
 CMAKE_GENERATOR_TOOLSET:INTERNAL=
 //Source directory with the top level CMakeLists.txt file for this
 // project
-CMAKE_HOME_DIRECTORY:INTERNAL=C:/Users/Emmanuel Chavarría/Documents/GitHub/Proyecto-1-SO
+CMAKE_HOME_DIRECTORY:INTERNAL=C:/Users/EMMANU~1/Documents/GitHub/Proyecto-1-SO
 //ADVANCED property for variable: CMAKE_LINKER
 CMAKE_LINKER-ADVANCED:INTERNAL=1
 //Name of CMakeLists files to read

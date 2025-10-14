@@ -13,6 +13,7 @@ typedef struct {
 	uint8_t ascii;      // encoded ASCII value (after XOR)
 	uint32_t index;       // position (0..capacity-1) where it was inserted
 	uint64_t timestamp_ms;// milliseconds since Unix epoch
+	uint8_t key_used;    // optional: key used by the writer (for debugging/trace)
 } MemEntry;
 
 // Initialize in-process memory with the given capacity (number of ASCII chars).
@@ -35,6 +36,9 @@ bool memory_is_full(void);
 // Write one full entry (ascii encoded value). Index and timestamp are filled internally.
 // Optionally returns the index and timestamp used.
 bool memory_write_entry(uint8_t ascii, uint32_t *out_index, uint64_t *out_ts);
+
+// Extended: write an entry including the writer key for debug/snapshot purposes
+bool memory_write_entry_with_key(uint8_t ascii, uint8_t key_used, uint32_t *out_index, uint64_t *out_ts);
 
 // Read one full entry (FIFO). Returns true if read.
 bool memory_read_entry(MemEntry *out);

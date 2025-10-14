@@ -1,4 +1,5 @@
 #include "page_sender.h"
+#include "sender_window.h"
 #include "processor.h"
 #include "app_state.h"
 #include "memory.h"
@@ -12,6 +13,8 @@
 #endif
 
 static char file_path[512] = "";
+// instance counter for spawned windows
+static int g_instance_counter = 0;
 
 // helper: open native file dialog into out buffer (UTF-8). Returns 1 on success.
 static int open_file_dialog_local(char *out, size_t outlen) {
@@ -55,10 +58,23 @@ void page_sender_handle_event(SDL_Event *e, int *out_next_page) {
     SDL_Rect fpbox = {120,490,480,30};
     SDL_Rect search_btn = { fpbox.x + fpbox.w + 8, fpbox.y, 80, fpbox.h };
     SDL_Rect iniciar_btn = {200, 180, 160, 50};
+    SDL_Rect newinst_btn = { back.x + back.w + 10, back.y, 180, back.h };
 
         if (mx >= back.x && mx <= back.x + back.w && my >= back.y && my <= back.y + back.h) {
             // go back to inicializador
             *out_next_page = 1; // PAGE_ONE
+            return;
+        }
+
+        if (mx >= newinst_btn.x && mx <= newinst_btn.x + newinst_btn.w && my >= newinst_btn.y && my <= newinst_btn.y + newinst_btn.h) {
+            // create a new sender window that shares the SAME memory identifier
+            // so all producers write to one bounded circular buffer (no overwrite when full)
+            const char *base_ident = app_state_get_identificador();
+            size_t cantidad = app_state_get_cantidad();
+            bool automatic = app_state_get_automatic();
+            const char *shared_ident = (base_ident && base_ident[0]) ? base_ident : "mem";
+            // Spawn window (non-blocking) with clean UI (NULL clave)
+            sender_window_start_async(shared_ident, (int)cantidad, NULL, automatic);
             return;
         }
 
@@ -93,8 +109,10 @@ void page_sender_handle_event(SDL_Event *e, int *out_next_page) {
 void page_sender_render(SDL_Renderer *ren, TTF_Font *font) {
     SDL_SetRenderDrawColor(ren, 245,245,245,255);
     SDL_RenderClear(ren);
-    // render back button
+    // render back button y nueva instancia
     SDL_Rect back = {20,20,100,40};
+    SDL_Rect newinst_btn = { back.x + back.w + 10, back.y, 180, back.h };
+    // Volver
     SDL_SetRenderDrawColor(ren, 70,130,180,255);
     SDL_RenderFillRect(ren, &back);
     if (font) {
@@ -104,6 +122,17 @@ void page_sender_render(SDL_Renderer *ren, TTF_Font *font) {
         SDL_Rect dv = { back.x + (back.w - tvw)/2, back.y + (back.h - tvh)/2, tvw, tvh };
         SDL_RenderCopy(ren, tv, NULL, &dv);
         SDL_DestroyTexture(tv); SDL_FreeSurface(sv);
+    }
+    // Nueva instancia
+    SDL_SetRenderDrawColor(ren, 255,140,0,255); // naranja
+    SDL_RenderFillRect(ren, &newinst_btn);
+    if (font) {
+        SDL_Surface *sni = TTF_RenderUTF8_Blended(font, "Nueva Instancia", (SDL_Color){255,255,255,255});
+        SDL_Texture *tni = SDL_CreateTextureFromSurface(ren, sni);
+        int tw, th; SDL_QueryTexture(tni, NULL, NULL, &tw, &th);
+        SDL_Rect d = { newinst_btn.x + (newinst_btn.w - tw)/2, newinst_btn.y + (newinst_btn.h - th)/2, tw, th };
+        SDL_RenderCopy(ren, tni, NULL, &d);
+        SDL_DestroyTexture(tni); SDL_FreeSurface(sni);
     }
 
     // file selector label and box (moved from page_one)

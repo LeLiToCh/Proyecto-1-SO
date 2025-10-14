@@ -15,6 +15,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "C:/Users/EMMANU~1/Documents/GitHub/Proyecto-1-SO/src/pages/page_one.c" "CMakeFiles/sdl_app.dir/src/pages/page_one.c.obj" "gcc" "CMakeFiles/sdl_app.dir/src/pages/page_one.c.obj.d"
   "C:/Users/EMMANU~1/Documents/GitHub/Proyecto-1-SO/src/pages/page_sender.c" "CMakeFiles/sdl_app.dir/src/pages/page_sender.c.obj" "gcc" "CMakeFiles/sdl_app.dir/src/pages/page_sender.c.obj.d"
   "C:/Users/EMMANU~1/Documents/GitHub/Proyecto-1-SO/src/pages/page_two.c" "CMakeFiles/sdl_app.dir/src/pages/page_two.c.obj" "gcc" "CMakeFiles/sdl_app.dir/src/pages/page_two.c.obj.d"
+  "C:/Users/EMMANU~1/Documents/GitHub/Proyecto-1-SO/src/pages/sender_window.c" "CMakeFiles/sdl_app.dir/src/pages/sender_window.c.obj" "gcc" "CMakeFiles/sdl_app.dir/src/pages/sender_window.c.obj.d"
   "C:/Users/EMMANU~1/Documents/GitHub/Proyecto-1-SO/src/processor.c" "CMakeFiles/sdl_app.dir/src/processor.c.obj" "gcc" "CMakeFiles/sdl_app.dir/src/processor.c.obj.d"
   )
 

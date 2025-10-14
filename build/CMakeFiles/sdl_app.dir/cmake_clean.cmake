@@ -13,6 +13,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/sdl_app.dir/src/pages/page_sender.c.obj.d"
   "CMakeFiles/sdl_app.dir/src/pages/page_two.c.obj"
   "CMakeFiles/sdl_app.dir/src/pages/page_two.c.obj.d"
+  "CMakeFiles/sdl_app.dir/src/pages/sender_window.c.obj"
+  "CMakeFiles/sdl_app.dir/src/pages/sender_window.c.obj.d"
   "CMakeFiles/sdl_app.dir/src/processor.c.obj"
   "CMakeFiles/sdl_app.dir/src/processor.c.obj.d"
   "libsdl_app.dll.a"

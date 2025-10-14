@@ -194,7 +194,7 @@ static uint64_t now_ms(void) {
 #endif
 }
 
-bool memory_write_entry(uint8_t ascii, uint32_t *out_index, uint64_t *out_ts) {
+static bool memory_write_core(uint8_t ascii, uint8_t key_used, uint32_t *out_index, uint64_t *out_ts) {
     uint64_t ts = now_ms();
     if (g_is_shared) {
 #ifdef _WIN32
@@ -205,6 +205,7 @@ bool memory_write_entry(uint8_t ascii, uint32_t *out_index, uint64_t *out_ts) {
         g_sh_data[g_sh->tail].ascii = ascii;
         g_sh_data[g_sh->tail].index = idx;
         g_sh_data[g_sh->tail].timestamp_ms = ts;
+        g_sh_data[g_sh->tail].key_used = key_used;
         g_sh->tail = (g_sh->tail + 1) % g_sh->cap;
         g_sh->size++;
         ReleaseMutex(g_hMutex);
@@ -219,6 +220,7 @@ bool memory_write_entry(uint8_t ascii, uint32_t *out_index, uint64_t *out_ts) {
         g_sh_data[g_sh->tail].ascii = ascii;
         g_sh_data[g_sh->tail].index = idx;
         g_sh_data[g_sh->tail].timestamp_ms = ts;
+        g_sh_data[g_sh->tail].key_used = key_used;
         g_sh->tail = (g_sh->tail + 1) % g_sh->cap;
         g_sh->size++;
         sem_post(g_sem_mutex);
@@ -233,11 +235,20 @@ bool memory_write_entry(uint8_t ascii, uint32_t *out_index, uint64_t *out_ts) {
         g_mem.buf[g_mem.tail].ascii = ascii;
         g_mem.buf[g_mem.tail].index = idx;
         g_mem.buf[g_mem.tail].timestamp_ms = ts;
+        g_mem.buf[g_mem.tail].key_used = key_used;
         g_mem.tail = (g_mem.tail + 1) % g_mem.cap;
         g_mem.size++;
         if (out_index) *out_index = idx; if (out_ts) *out_ts = ts;
         return true;
     }
+}
+
+bool memory_write_entry(uint8_t ascii, uint32_t *out_index, uint64_t *out_ts) {
+    return memory_write_core(ascii, 0u, out_index, out_ts);
+}
+
+bool memory_write_entry_with_key(uint8_t ascii, uint8_t key_used, uint32_t *out_index, uint64_t *out_ts) {
+    return memory_write_core(ascii, key_used, out_index, out_ts);
 }
 
 bool memory_write_char(char c) {
@@ -442,7 +453,7 @@ void memory_debug_print_snapshot(void) {
         size_t cur = g_sh->head;
         for (size_t i = 0; i < g_sh->size; ++i) {
             MemEntry e = g_sh_data[cur];
-            printf("  #%02zu slot=%02zu ascii=%3u ts=%llu\n", i, cur, (unsigned)e.ascii, (unsigned long long)e.timestamp_ms);
+            printf("  #%02zu slot=%02zu ascii=%3u ts=%llu key=0x%02X\n", i, cur, (unsigned)e.ascii, (unsigned long long)e.timestamp_ms, (unsigned)e.key_used);
             cur = (cur + 1) % g_sh->cap;
         }
         ReleaseMutex(g_hMutex);
@@ -452,7 +463,7 @@ void memory_debug_print_snapshot(void) {
         size_t cur = g_sh->head;
         for (size_t i = 0; i < g_sh->size; ++i) {
             MemEntry e = g_sh_data[cur];
-            printf("  #%02zu slot=%02zu ascii=%3u ts=%llu\n", i, cur, (unsigned)e.ascii, (unsigned long long)e.timestamp_ms);
+            printf("  #%02zu slot=%02zu ascii=%3u ts=%llu key=0x%02X\n", i, cur, (unsigned)e.ascii, (unsigned long long)e.timestamp_ms, (unsigned)e.key_used);
             cur = (cur + 1) % g_sh->cap;
         }
         sem_post(g_sem_mutex);
@@ -461,7 +472,7 @@ void memory_debug_print_snapshot(void) {
         size_t cur = g_mem.head;
         for (size_t i = 0; i < g_mem.size; ++i) {
             MemEntry e = g_mem.buf[cur];
-            printf("  #%02zu slot=%02zu ascii=%3u ts=%llu\n", i, cur, (unsigned)e.ascii, (unsigned long long)e.timestamp_ms);
+            printf("  #%02zu slot=%02zu ascii=%3u ts=%llu key=0x%02X\n", i, cur, (unsigned)e.ascii, (unsigned long long)e.timestamp_ms, (unsigned)e.key_used);
             cur = (cur + 1) % g_mem.cap;
         }
     }
