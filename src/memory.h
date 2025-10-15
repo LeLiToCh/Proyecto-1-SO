@@ -66,4 +66,10 @@ bool memory_init_shared(const char *name, size_t capacity, bool *out_created);
 // Shows size/capacity and, for each occupied slot: logical order, slot index, ascii, and timestamp.
 void memory_debug_print_snapshot(void);
 
+// Termination coordination (optional helpers):
+// Broadcast a termination signal to all attached processes/threads waiting on this region.
+void memory_broadcast_terminate(void);
+// Non-blocking check: returns true if a termination signal has been broadcast.
+bool memory_termination_notified(void);
+
 #endif // MEMORY_H
