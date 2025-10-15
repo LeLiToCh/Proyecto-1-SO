@@ -45,22 +45,8 @@ static void print_decoded_entry(const MemEntry *e, uint8_t key) {
     fflush(stdout);
 }
 
+// Logica principal del receptor
 bool process_memory_to_output(const char *filepath, const char *key_bits, bool automatic) {
-    // Imprimir todos los datos relevantes del RECEPTOR
-    extern const char *app_state_get_identificador(void);
-    extern size_t app_state_get_cantidad(void);
-    extern const char *app_state_get_clave(void);
-    extern bool app_state_get_automatic(void);
-
-    printf("[INFO] --- INICIO DE RECEPCION ---\n");
-    printf("Identificador: %s\n", app_state_get_identificador());
-    printf("Cantidad: %zu\n", app_state_get_cantidad());
-    printf("Clave: %s\n", app_state_get_clave());
-    printf("Key_bits: %s\n", key_bits);
-    printf("Archivo: %s\n", filepath);
-    printf("Modo: %s\n", automatic ? "Automatico" : "Manual");
-    printf("-------------------------------\n");
-    
     FILE *f = NULL;
 #ifdef _WIN32
     // Convertir ruta UTF-8 a UTF-16 y usar _wfopen para manejar acentos
@@ -79,13 +65,32 @@ bool process_memory_to_output(const char *filepath, const char *key_bits, bool a
         f = fopen(filepath, "wb");
     }
     if (!f) {
-        perror("[receptor] fopen");
+        perror("[receptor] Error al abrir archivo de salida");
         return false;
     }
+    
+    // Imprimir todos los datos relevantes del RECEPTOR
+    extern const char *app_state_get_identificador(void);
+    extern size_t app_state_get_cantidad(void);
+    extern const char *app_state_get_clave(void);
+    extern bool app_state_get_automatic(void);
+
+    printf("[INFO] --- INICIO DE RECEPCION ---\n");
+    printf("Identificador: %s\n", app_state_get_identificador());
+    printf("Cantidad: %zu\n", app_state_get_cantidad());
+    printf("Clave: %s\n", app_state_get_clave());
+    printf("Key_bits: %s\n", key_bits);
+    printf("Archivo: %s\n", filepath);
+    printf("Modo: %s\n", automatic ? "Automatico" : "Manual");
+    printf("-------------------------------\n");
 
     uint8_t key = key_from_bits(key_bits);
     printf("[receptor] Clave (8-bit) usada: 0x%02X\n", key);
-    printf("%-6s %-6s %-6s %-12s %-6s\n", "ASCII", "INDEX", "HORA", "DECODING", "KEY");
+    // Encabezado de la tabla
+    printf("\x1b[32m---------------------------------------------------------\x1b[0m\n");
+    printf("\x1b[32m| \x1b[0m%-6s \x1b[32m| \x1b[0m%-6s \x1b[32m| \x1b[0m%-12s \x1b[32m| \x1b[0m%-6s \x1b[32m| \x1b[0m%-6s \x1b[32m|\x1b[0m\n", 
+           "CHAR", "INDEX", "HORA", "DECOD", "KEY");
+    printf("\x1b[32m---------------------------------------------------------\x1b[0m\n");
 
     int c;
     while((c = SDL_PollEvent(NULL)) != SDL_QUIT) {
@@ -96,6 +101,9 @@ bool process_memory_to_output(const char *filepath, const char *key_bits, bool a
             char decoded_char = (char)(e.ascii ^ key);
             fputc(decoded_char, f);
             fflush(f);
+            // Mostrar snapshot de memoria después de cada lectura
+            // memory_debug_print_snapshot();
+            // fflush(stdout);
 
             if (!automatic) {
                 printf("Presione Enter para leer el siguiente caracter...\n");
@@ -105,14 +113,9 @@ bool process_memory_to_output(const char *filepath, const char *key_bits, bool a
             // Si no hay datos, esperar un poco antes de intentar de nuevo
             SDL_Delay(100);
         }
-
-        // Imprimir entrada decodificada
-        print_decoded_entry(&e, key);
-        // Mostrar snapshot de memoria después de cada lectura
-        memory_debug_print_snapshot();
-        fflush(stdout);
-
     }
+
+    printf("\n[receptor] Cerrando archivo de salida y finalizando...\n");
     fclose(f);
     return true;
 }
@@ -126,6 +129,7 @@ typedef struct {
 static int receptor_thread(void *data){
     ReceptorArgs *a = (ReceptorArgs *)data;
     process_memory_to_output(a->path, a->key, a->automatic ? true : false);
+    
     // Al terminar, imprimir resumen de memoria
     printf("[INFO] --- FIN DE RECEPCION ---\n");
     memory_debug_print_snapshot();
@@ -143,12 +147,12 @@ bool receptor_start_async(const char *filepath, const char *key_bits, bool autom
     a->key[sizeof(a->key)-1] = '\0';
     a->automatic = automatic ? 1 : 0;
 
-    SDL_Thread *thread = SDL_CreateThread(receptor_thread, "ReceptorThread", (void *)a);
-    if (!thread) {
+    SDL_Thread *th = SDL_CreateThread(receptor_thread, "receptor_thread", a);
+    if (!th) {
         free(a);
         fprintf(stderr, "[receptor] SDL_CreateThread failed: %s\n", SDL_GetError());
         return false;
     }
-    SDL_DetachThread(thread);
+
     return true;
 }
