@@ -30,12 +30,12 @@ static void display_statistics(const SystemStats *stats) {
     printf("\x1b[36m================================================\x1b[0m \n");
 
     // Estadísticas de Transferencia
-    printf("\x1b[32m- Transferencia:\x1b[0m\\n");
+    printf("\x1b[32m- Transferencia:\x1b[0m \n");
     printf("  \x1b[34m- Caracteres Transferidos (Escritos): \x1b[0m%zu \n", stats->total_chars_transferred);
     
     // Estadísticas de Memoria
-    printf("\x1b[32m- Memoria Compartida:\x1b[0m\\n");
-    printf("  \x1b[34m- Capacidad Total: \x1b[0m%zu caracteres\\n", stats->memory_capacity);
+    printf("\x1b[32m- Memoria Compartida:\x1b[0m \n");
+    printf("  \x1b[34m- Capacidad Total: \x1b[0m%zu caracteres \n", stats->memory_capacity);
     printf("  \x1b[34m- Caracteres Pendientes (Final): \x1b[0m%zu caracteres \n", stats->chars_in_memory_final);
     
     // Estadísticas de Procesos
@@ -68,7 +68,7 @@ bool finalizador_shutdown_system(size_t total_chars_written) {
 
     int attempts = 0;
     const int max_attempts = 20;
-    const int delay_ms = 10;
+    const int delay_ms = 100;
     bool receptor_finished = false;
 
     while (attempts < max_attempts) {

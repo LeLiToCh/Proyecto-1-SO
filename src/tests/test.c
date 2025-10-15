@@ -2,7 +2,7 @@
 // write encoded chars into memory and then post SDL_QUIT to stop.
 
 #include "receptor.h"
-#include "../memory.h" // Asegúrate de que la ruta a memory.h sea correcta
+#include "../src/memory.h" // Asegúrate de que la ruta a memory.h sea correcta
 #include <stdio.h>
 #include <SDL.h>
 #include <string.h>
@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
     // inicie y se BLOQUEE correctamente en memory_read_entry() (sin busy waiting).
 	SDL_Delay(1000); 
 
-	const char *msg = "Prueba 10 del receptor\nIntentando enviar varios caracteres...\n";
+	const char *msg = "Hola Jose...\nPrueba de funcionamiento del receptor.\n";
 	for (size_t i = 0; i < strlen(msg); ++i) {
         // La clave para la escritura es 0x00 para que coincida con la clave de lectura
 		if (!memory_write_entry_with_key((uint8_t)msg[i], 0x00, NULL, NULL)) {
@@ -79,7 +79,7 @@ int main(int argc, char **argv) {
         SDL_Delay(10); // Pausa mínima para no entrar en busy waiting aquí.
     }
     
-    printf("Test finalizado: revisa '%s'\\n", outpath);
+    printf("Test finalizado: revisa '%s'\n", outpath);
     
 	// Solo después de que el hilo Receptor haya tenido tiempo de terminar, cerramos los recursos.
 	memory_shutdown();
