@@ -1,2 +1,1 @@
-Prueba 10 del receptor
-Intentando enviar varios caracteres...
+Esta es la primera parte del mensaje para el Finalizador. Debe a

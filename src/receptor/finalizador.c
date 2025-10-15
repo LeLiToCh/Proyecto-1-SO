@@ -15,45 +15,45 @@ static SystemStats collect_statistics( size_t total_chars_written) {
     stats.total_chars_transferred = total_chars_written;
 
     // Estadisticas de procesos
-    stats.active_processors = process_count_active();
-    stats.total_processors = process_count_total();
-    stats.active_receptors = receptor_count_active();
-    stats.total_receptors = receptor_count_total();
+    stats.active_processors = 0;
+    stats.total_processors = 1;
+    stats.active_receptors = 1;
+    stats.total_receptors = 1;
 
     return stats;
 }
 
 // Recopila y muestra estadísticas del sistema, luego apaga todo ordenadamente.
 static void display_statistics(const SystemStats *stats) {
-    printf("\n\n\x1b[36m================================================\x1b[0m\n");
-    printf("\x1b[36m| \x1b[33m\x1b[1mESTADÍSTICAS GENERALES DEL SISTEMA\x1b[0m\x1b[36m |\x1b[0m\n");
-    printf("\x1b[36m================================================\x1b[0m\n");
+    printf("\n\n\x1b[36m================================================\x1b[0m \n");
+    printf("\x1b[36m| \x1b[33m\x1b[1mESTADÍSTICAS GENERALES DEL SISTEMA\x1b[0m\x1b[36m |\x1b[0m \n");
+    printf("\x1b[36m================================================\x1b[0m \n");
 
     // Estadísticas de Transferencia
     printf("\x1b[32m- Transferencia:\x1b[0m\\n");
-    printf("  \x1b[34m- Caracteres Transferidos (Escritos): \x1b[0m%zu\\n", stats->total_chars_transferred);
+    printf("  \x1b[34m- Caracteres Transferidos (Escritos): \x1b[0m%zu \n", stats->total_chars_transferred);
     
     // Estadísticas de Memoria
     printf("\x1b[32m- Memoria Compartida:\x1b[0m\\n");
     printf("  \x1b[34m- Capacidad Total: \x1b[0m%zu caracteres\\n", stats->memory_capacity);
-    printf("  \x1b[34m- Caracteres Pendientes (Final): \x1b[0m%zu caracteres\\n", stats->chars_in_memory_final);
+    printf("  \x1b[34m- Caracteres Pendientes (Final): \x1b[0m%zu caracteres \n", stats->chars_in_memory_final);
     
     // Estadísticas de Procesos
-    printf("\x1b[32m- Procesos/Hilos:\x1b[0m\\n");
-    printf("  \x1b[34m- Emisores Vivos/Totales: \x1b[0m%u / %u\\n", stats->active_processors, stats->total_processors);
-    printf("  \x1b[34m- Receptores Vivos/Totales: \x1b[0m%u / %u\\n", stats->active_receptors, stats->total_receptors);
+    printf("\x1b[32m- Procesos/Hilos:\x1b[0m \n");
+    printf("  \x1b[34m- Emisores Vivos/Totales: \x1b[0m%u / %u \n", stats->active_processors, stats->total_processors);
+    printf("  \x1b[34m- Receptores Vivos/Totales: \x1b[0m%u / %u \n", stats->active_receptors, stats->total_receptors);
     
     // Memoria Utilizada (como porcentaje)
     float usage_percent = (stats->memory_capacity > 0) 
                           ? ((float)stats->chars_in_memory_final / stats->memory_capacity) * 100.0f 
                           : 0.0f;
-    printf("\x1b[32m- Utilización de Memoria (Final):\x1b[0m %.2f%%\\n", usage_percent);
+    printf("\x1b[32m- Utilización de Memoria (Final):\x1b[0m %.2f%% \n", usage_percent);
     
     printf("\x1b[36m================================================\x1b[0m\n");
 }
 
 bool finalizador_shutdown_system(size_t total_chars_written) {
-    printf("[FINALIZADOR] Iniciando apagado elegante del sistema.\\n");
+    printf("[FINALIZADOR] Iniciando apagado elegante del sistema. \n");
 
     SystemStats stats = collect_statistics(total_chars_written);
 
@@ -61,9 +61,9 @@ bool finalizador_shutdown_system(size_t total_chars_written) {
     quit_event.type = SDL_QUIT;
 
     if (SDL_PushEvent(&quit_event) == 0) {
-        fprintf(stderr, "[FINALIZADOR] Error al enviar evento SDL_QUIT: %s\\n", SDL_GetError());
+        fprintf(stderr, "[FINALIZADOR] Error al enviar evento SDL_QUIT: %s \n", SDL_GetError());
     } else {
-        printf("[FINALIZADOR] Evento SDL_QUIT enviado a todos los procesos.\\n");
+        printf("[FINALIZADOR] Evento SDL_QUIT enviado a todos los procesos. \n");
     }
 
     int attempts = 0;
@@ -80,9 +80,9 @@ bool finalizador_shutdown_system(size_t total_chars_written) {
     }
 
     if (!receptor_finished) {
-        fprintf(stderr, "[FINALIZADOR] Advertencia: Receptor no terminó elegantemente. Forzando liberación.\\nn");
+        fprintf(stderr, "[FINALIZADOR] Advertencia: Receptor no terminó elegantemente. Forzando liberación. \n");
     } else {
-        printf("[FINALIZADOR] Apagado de hilos dependientes exitoso.\\n");
+        printf("[FINALIZADOR] Apagado de hilos dependientes exitoso. \n");
     }
 
     display_statistics(&stats);
@@ -90,6 +90,6 @@ bool finalizador_shutdown_system(size_t total_chars_written) {
     memory_shutdown();
     SDL_Quit();
 
-    printf("[FINALIZADOR] Sistema apagado y recursos liberados.\\n");
+    printf("[FINALIZADOR] Sistema apagado y recursos liberados. \n");
     return true;
 }
