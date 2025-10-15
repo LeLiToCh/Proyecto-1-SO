@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
     // inicie y se BLOQUEE correctamente en memory_read_entry() (sin busy waiting).
 	SDL_Delay(1000); 
 
-	const char *msg = "Hola, prueba 4 del receptor\n";
+	const char *msg = "Prueba 10 del receptor\nIntentando enviar varios caracteres...\n";
 	for (size_t i = 0; i < strlen(msg); ++i) {
         // La clave para la escritura es 0x00 para que coincida con la clave de lectura
 		if (!memory_write_entry_with_key((uint8_t)msg[i], 0x00, NULL, NULL)) {

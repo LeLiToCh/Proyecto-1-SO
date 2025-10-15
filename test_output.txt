@@ -1,1 +1,2 @@
-Hola, prueba 4 del receptor
+Prueba 10 del receptor
+Intentando enviar varios caracteres...

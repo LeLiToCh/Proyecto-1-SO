@@ -92,8 +92,8 @@ bool process_memory_to_output(const char *filepath, const char *key_bits, bool a
            "CHAR", "INDEX", "HORA", "DECOD", "KEY");
     printf("\x1b[32m---------------------------------------------------------\x1b[0m\n");
 
-    int c;
-    while((c = SDL_PollEvent(NULL)) != SDL_QUIT) {
+    int event_status = 0;
+    while(event_status != SDL_QUIT) {
         MemEntry e;
         if (memory_read_entry(&e)) {
             print_decoded_entry(&e, key);
@@ -107,11 +107,21 @@ bool process_memory_to_output(const char *filepath, const char *key_bits, bool a
 
             if (!automatic) {
                 printf("Presione Enter para leer el siguiente caracter...\n");
-                while ((c = getchar()) != '\n' && c != EOF);
+                while ((event_status = getchar()) != '\n' && event_status != EOF);
             }
         } else {
             // Si no hay datos, esperar un poco antes de intentar de nuevo
-            SDL_Delay(100);
+            event_status = SDL_PollEvent(NULL);
+
+            if (event_status == SDL_QUIT) {
+                printf("[receptor] Evento SDL_QUIT recibido, terminando...\n");
+            } else {
+                SDL_Delay(50);
+            }
+        }
+
+        if (event_status != SDL_QUIT) {
+            event_status = SDL_PollEvent(NULL);
         }
     }
 
