@@ -1,5 +1,5 @@
 #include "receptor.h"
-#include "../src/memory.h" // Cambiar la ruta al sacar de receptor
+#include "memory.h" // Cambiar la ruta al sacar de receptor
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>

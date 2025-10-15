@@ -5,8 +5,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "../src/memory.h"
-#include "../src/processor.h"
+#include "memory.h"
+#include "processor.h"
 #include "receptor.h"
 
 typedef struct {
