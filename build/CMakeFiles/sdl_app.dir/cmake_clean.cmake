@@ -7,6 +7,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/sdl_app.dir/src/main.c.o.d"
   "CMakeFiles/sdl_app.dir/src/memory.c.o"
   "CMakeFiles/sdl_app.dir/src/memory.c.o.d"
+  "CMakeFiles/sdl_app.dir/src/monitor.c.o"
+  "CMakeFiles/sdl_app.dir/src/monitor.c.o.d"
   "CMakeFiles/sdl_app.dir/src/pages/emisor.c.o"
   "CMakeFiles/sdl_app.dir/src/pages/emisor.c.o.d"
   "CMakeFiles/sdl_app.dir/src/pages/inicializador.c.o"

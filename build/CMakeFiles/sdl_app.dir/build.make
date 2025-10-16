@@ -139,10 +139,24 @@ CMakeFiles/sdl_app.dir/src/finalizador.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/sdl_app.dir/src/finalizador.c.s"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "/home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/src/finalizador.c" -o CMakeFiles/sdl_app.dir/src/finalizador.c.s
 
+CMakeFiles/sdl_app.dir/src/monitor.c.o: CMakeFiles/sdl_app.dir/flags.make
+CMakeFiles/sdl_app.dir/src/monitor.c.o: ../src/monitor.c
+CMakeFiles/sdl_app.dir/src/monitor.c.o: CMakeFiles/sdl_app.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_6) "Building C object CMakeFiles/sdl_app.dir/src/monitor.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/sdl_app.dir/src/monitor.c.o -MF CMakeFiles/sdl_app.dir/src/monitor.c.o.d -o CMakeFiles/sdl_app.dir/src/monitor.c.o -c "/home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/src/monitor.c"
+
+CMakeFiles/sdl_app.dir/src/monitor.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/sdl_app.dir/src/monitor.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "/home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/src/monitor.c" > CMakeFiles/sdl_app.dir/src/monitor.c.i
+
+CMakeFiles/sdl_app.dir/src/monitor.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/sdl_app.dir/src/monitor.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "/home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/src/monitor.c" -o CMakeFiles/sdl_app.dir/src/monitor.c.s
+
 CMakeFiles/sdl_app.dir/src/pages/modo_operacion.c.o: CMakeFiles/sdl_app.dir/flags.make
 CMakeFiles/sdl_app.dir/src/pages/modo_operacion.c.o: ../src/pages/modo_operacion.c
 CMakeFiles/sdl_app.dir/src/pages/modo_operacion.c.o: CMakeFiles/sdl_app.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_6) "Building C object CMakeFiles/sdl_app.dir/src/pages/modo_operacion.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_7) "Building C object CMakeFiles/sdl_app.dir/src/pages/modo_operacion.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/sdl_app.dir/src/pages/modo_operacion.c.o -MF CMakeFiles/sdl_app.dir/src/pages/modo_operacion.c.o.d -o CMakeFiles/sdl_app.dir/src/pages/modo_operacion.c.o -c "/home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/src/pages/modo_operacion.c"
 
 CMakeFiles/sdl_app.dir/src/pages/modo_operacion.c.i: cmake_force
@@ -156,7 +170,7 @@ CMakeFiles/sdl_app.dir/src/pages/modo_operacion.c.s: cmake_force
 CMakeFiles/sdl_app.dir/src/pages/inicializador.c.o: CMakeFiles/sdl_app.dir/flags.make
 CMakeFiles/sdl_app.dir/src/pages/inicializador.c.o: ../src/pages/inicializador.c
 CMakeFiles/sdl_app.dir/src/pages/inicializador.c.o: CMakeFiles/sdl_app.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_7) "Building C object CMakeFiles/sdl_app.dir/src/pages/inicializador.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_8) "Building C object CMakeFiles/sdl_app.dir/src/pages/inicializador.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/sdl_app.dir/src/pages/inicializador.c.o -MF CMakeFiles/sdl_app.dir/src/pages/inicializador.c.o.d -o CMakeFiles/sdl_app.dir/src/pages/inicializador.c.o -c "/home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/src/pages/inicializador.c"
 
 CMakeFiles/sdl_app.dir/src/pages/inicializador.c.i: cmake_force
@@ -170,7 +184,7 @@ CMakeFiles/sdl_app.dir/src/pages/inicializador.c.s: cmake_force
 CMakeFiles/sdl_app.dir/src/pages/page_two.c.o: CMakeFiles/sdl_app.dir/flags.make
 CMakeFiles/sdl_app.dir/src/pages/page_two.c.o: ../src/pages/page_two.c
 CMakeFiles/sdl_app.dir/src/pages/page_two.c.o: CMakeFiles/sdl_app.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_8) "Building C object CMakeFiles/sdl_app.dir/src/pages/page_two.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_9) "Building C object CMakeFiles/sdl_app.dir/src/pages/page_two.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/sdl_app.dir/src/pages/page_two.c.o -MF CMakeFiles/sdl_app.dir/src/pages/page_two.c.o.d -o CMakeFiles/sdl_app.dir/src/pages/page_two.c.o -c "/home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/src/pages/page_two.c"
 
 CMakeFiles/sdl_app.dir/src/pages/page_two.c.i: cmake_force
@@ -184,7 +198,7 @@ CMakeFiles/sdl_app.dir/src/pages/page_two.c.s: cmake_force
 CMakeFiles/sdl_app.dir/src/pages/nueva_instancia.c.o: CMakeFiles/sdl_app.dir/flags.make
 CMakeFiles/sdl_app.dir/src/pages/nueva_instancia.c.o: ../src/pages/nueva_instancia.c
 CMakeFiles/sdl_app.dir/src/pages/nueva_instancia.c.o: CMakeFiles/sdl_app.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_9) "Building C object CMakeFiles/sdl_app.dir/src/pages/nueva_instancia.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_10) "Building C object CMakeFiles/sdl_app.dir/src/pages/nueva_instancia.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/sdl_app.dir/src/pages/nueva_instancia.c.o -MF CMakeFiles/sdl_app.dir/src/pages/nueva_instancia.c.o.d -o CMakeFiles/sdl_app.dir/src/pages/nueva_instancia.c.o -c "/home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/src/pages/nueva_instancia.c"
 
 CMakeFiles/sdl_app.dir/src/pages/nueva_instancia.c.i: cmake_force
@@ -198,7 +212,7 @@ CMakeFiles/sdl_app.dir/src/pages/nueva_instancia.c.s: cmake_force
 CMakeFiles/sdl_app.dir/src/pages/emisor.c.o: CMakeFiles/sdl_app.dir/flags.make
 CMakeFiles/sdl_app.dir/src/pages/emisor.c.o: ../src/pages/emisor.c
 CMakeFiles/sdl_app.dir/src/pages/emisor.c.o: CMakeFiles/sdl_app.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_10) "Building C object CMakeFiles/sdl_app.dir/src/pages/emisor.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_11) "Building C object CMakeFiles/sdl_app.dir/src/pages/emisor.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/sdl_app.dir/src/pages/emisor.c.o -MF CMakeFiles/sdl_app.dir/src/pages/emisor.c.o.d -o CMakeFiles/sdl_app.dir/src/pages/emisor.c.o -c "/home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/src/pages/emisor.c"
 
 CMakeFiles/sdl_app.dir/src/pages/emisor.c.i: cmake_force
@@ -212,7 +226,7 @@ CMakeFiles/sdl_app.dir/src/pages/emisor.c.s: cmake_force
 CMakeFiles/sdl_app.dir/src/app_state.c.o: CMakeFiles/sdl_app.dir/flags.make
 CMakeFiles/sdl_app.dir/src/app_state.c.o: ../src/app_state.c
 CMakeFiles/sdl_app.dir/src/app_state.c.o: CMakeFiles/sdl_app.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_11) "Building C object CMakeFiles/sdl_app.dir/src/app_state.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_12) "Building C object CMakeFiles/sdl_app.dir/src/app_state.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/sdl_app.dir/src/app_state.c.o -MF CMakeFiles/sdl_app.dir/src/app_state.c.o.d -o CMakeFiles/sdl_app.dir/src/app_state.c.o -c "/home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/src/app_state.c"
 
 CMakeFiles/sdl_app.dir/src/app_state.c.i: cmake_force
@@ -230,6 +244,7 @@ sdl_app_OBJECTS = \
 "CMakeFiles/sdl_app.dir/src/processor.c.o" \
 "CMakeFiles/sdl_app.dir/src/receptor.c.o" \
 "CMakeFiles/sdl_app.dir/src/finalizador.c.o" \
+"CMakeFiles/sdl_app.dir/src/monitor.c.o" \
 "CMakeFiles/sdl_app.dir/src/pages/modo_operacion.c.o" \
 "CMakeFiles/sdl_app.dir/src/pages/inicializador.c.o" \
 "CMakeFiles/sdl_app.dir/src/pages/page_two.c.o" \
@@ -245,6 +260,7 @@ sdl_app: CMakeFiles/sdl_app.dir/src/memory.c.o
 sdl_app: CMakeFiles/sdl_app.dir/src/processor.c.o
 sdl_app: CMakeFiles/sdl_app.dir/src/receptor.c.o
 sdl_app: CMakeFiles/sdl_app.dir/src/finalizador.c.o
+sdl_app: CMakeFiles/sdl_app.dir/src/monitor.c.o
 sdl_app: CMakeFiles/sdl_app.dir/src/pages/modo_operacion.c.o
 sdl_app: CMakeFiles/sdl_app.dir/src/pages/inicializador.c.o
 sdl_app: CMakeFiles/sdl_app.dir/src/pages/page_two.c.o
@@ -253,7 +269,7 @@ sdl_app: CMakeFiles/sdl_app.dir/src/pages/emisor.c.o
 sdl_app: CMakeFiles/sdl_app.dir/src/app_state.c.o
 sdl_app: CMakeFiles/sdl_app.dir/build.make
 sdl_app: CMakeFiles/sdl_app.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir="/home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_12) "Linking C executable sdl_app"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir="/home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_13) "Linking C executable sdl_app"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/sdl_app.dir/link.txt --verbose=$(VERBOSE)
 	/usr/bin/cmake -E copy_if_different /home/jose/Documents/TEC/2025/II\ Semestre/CE4303\ -Principios\ de\ sistemas\ operativos/Proyectos/Proyecto-1-SO/font.ttf /home/jose/Documents/TEC/2025/II\ Semestre/CE4303\ -Principios\ de\ sistemas\ operativos/Proyectos/Proyecto-1-SO/build/font.ttf
 

@@ -15,10 +15,12 @@ static SystemStats collect_statistics( size_t total_chars_written) {
     stats.total_chars_transferred = total_chars_written;
 
     // Estadisticas de procesos
-    stats.active_processors = 0;
-    stats.total_processors = 1;
-    stats.active_receptors = 1;
-    stats.total_receptors = 1;
+    uint32_t total_p = 0, active_p = 0, total_r = 0, active_r = 0;
+    monitor_get_counts(&total_p, &active_p, &total_r, &active_r);
+    stats.total_processors = (size_t) total_p;
+    stats.active_processors = (size_t) active_p;
+    stats.total_receptors = (size_t) total_r;
+    stats.active_receptors = (size_t) active_r;
 
     return stats;
 }
@@ -67,16 +69,23 @@ bool finalizador_shutdown_system(size_t total_chars_written) {
     }
 
     int attempts = 0;
-    const int max_attempts = 20;
+    const int max_attempts = 50;
     const int delay_ms = 100;
     bool receptor_finished = false;
 
     while (attempts < max_attempts) {
-        if (SDL_PollEvent(NULL) != SDL_QUIT) {
+        uint32_t tp, ap, tr, ar;
+        monitor_get_counts(&tp, &ap, &tr, &ar);
+        if (ap == 0 && ar == 0) {
+            printf("[FINALIZADOR] Todos los procesos han terminado. \n");
             receptor_finished = true;
             break;
         }
         SDL_Delay(delay_ms);
+        attempts++;
+    }
+    if (attempts == max_attempts) {
+        fprintf(stderr, "[FINALIZADOR] Tiempo de espera agotado. Algunos procesos no respondieron. \n");
     }
 
     if (!receptor_finished) {

@@ -85,6 +85,7 @@ set(SOURCE_FILES
   src/processor.c
   src/receptor.c
   src/finalizador.c
+  src/monitor.c
   src/pages/modo_operacion.c
   src/pages/inicializador.c
   src/pages/page_two.c

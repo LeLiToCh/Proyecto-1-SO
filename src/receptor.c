@@ -1,5 +1,6 @@
 #include "receptor.h"
 #include "memory.h" // Cambiar la ruta al sacar de receptor
+#include "monitor.h"
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
@@ -141,6 +142,7 @@ static int receptor_thread(void *data){
     printf("[INFO] --- FIN DE RECEPCION ---\n");
     memory_debug_print_snapshot();
     free(a);
+    monitor_receptor_stopped();
     return 0;
 }
 
@@ -158,6 +160,7 @@ bool receptor_start_async(const char *key_bits, bool automatic) {
     a->automatic = automatic ? 1 : 0;
 
     SDL_Thread *th = SDL_CreateThread(receptor_thread, "receptor_thread", a);
+    monitor_receptor_started();
     if (!th) {
         free(a);
         fprintf(stderr, "[receptor] SDL_CreateThread failed: %s\n", SDL_GetError());

@@ -63,6 +63,8 @@ void page_sender_handle_event(SDL_Event *e, int *out_next_page) {
     SDL_Rect newinst_btn = { back.x + back.w + 10, back.y, 180, back.h };
 
         if (mx >= back.x && mx <= back.x + back.w && my >= back.y && my <= back.y + back.h) {
+            // Invocar finalizador antes de cerrar la ventana
+            finalizador_shutdown_system(app_state_get_cantidad());
             // go back to inicializador
             *out_next_page = 1; // PAGE_ONE
             return;

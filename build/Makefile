@@ -225,6 +225,30 @@ src/memory.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/sdl_app.dir/build.make CMakeFiles/sdl_app.dir/src/memory.c.s
 .PHONY : src/memory.c.s
 
+src/monitor.o: src/monitor.c.o
+.PHONY : src/monitor.o
+
+# target to build an object file
+src/monitor.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sdl_app.dir/build.make CMakeFiles/sdl_app.dir/src/monitor.c.o
+.PHONY : src/monitor.c.o
+
+src/monitor.i: src/monitor.c.i
+.PHONY : src/monitor.i
+
+# target to preprocess a source file
+src/monitor.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sdl_app.dir/build.make CMakeFiles/sdl_app.dir/src/monitor.c.i
+.PHONY : src/monitor.c.i
+
+src/monitor.s: src/monitor.c.s
+.PHONY : src/monitor.s
+
+# target to generate assembly for a file
+src/monitor.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/sdl_app.dir/build.make CMakeFiles/sdl_app.dir/src/monitor.c.s
+.PHONY : src/monitor.c.s
+
 src/pages/emisor.o: src/pages/emisor.c.o
 .PHONY : src/pages/emisor.o
 
@@ -414,6 +438,9 @@ help:
 	@echo "... src/memory.o"
 	@echo "... src/memory.i"
 	@echo "... src/memory.s"
+	@echo "... src/monitor.o"
+	@echo "... src/monitor.i"
+	@echo "... src/monitor.s"
 	@echo "... src/pages/emisor.o"
 	@echo "... src/pages/emisor.i"
 	@echo "... src/pages/emisor.s"
