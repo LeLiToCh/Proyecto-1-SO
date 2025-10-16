@@ -128,6 +128,30 @@ sdl_app/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/build
 .PHONY : sdl_app/fast
 
+src/app_state.obj: src/app_state.c.obj
+.PHONY : src/app_state.obj
+
+# target to build an object file
+src/app_state.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/app_state.c.obj
+.PHONY : src/app_state.c.obj
+
+src/app_state.i: src/app_state.c.i
+.PHONY : src/app_state.i
+
+# target to preprocess a source file
+src/app_state.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/app_state.c.i
+.PHONY : src/app_state.c.i
+
+src/app_state.s: src/app_state.c.s
+.PHONY : src/app_state.s
+
+# target to generate assembly for a file
+src/app_state.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/app_state.c.s
+.PHONY : src/app_state.c.s
+
 src/main.obj: src/main.c.obj
 .PHONY : src/main.obj
 
@@ -151,6 +175,30 @@ src/main.s: src/main.c.s
 src/main.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/main.c.s
 .PHONY : src/main.c.s
+
+src/memory.obj: src/memory.c.obj
+.PHONY : src/memory.obj
+
+# target to build an object file
+src/memory.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/memory.c.obj
+.PHONY : src/memory.c.obj
+
+src/memory.i: src/memory.c.i
+.PHONY : src/memory.i
+
+# target to preprocess a source file
+src/memory.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/memory.c.i
+.PHONY : src/memory.c.i
+
+src/memory.s: src/memory.c.s
+.PHONY : src/memory.s
+
+# target to generate assembly for a file
+src/memory.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/memory.c.s
+.PHONY : src/memory.c.s
 
 src/pages/page_main.obj: src/pages/page_main.c.obj
 .PHONY : src/pages/page_main.obj
@@ -200,6 +248,30 @@ src/pages/page_one.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/page_one.c.s
 .PHONY : src/pages/page_one.c.s
 
+src/pages/page_sender.obj: src/pages/page_sender.c.obj
+.PHONY : src/pages/page_sender.obj
+
+# target to build an object file
+src/pages/page_sender.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/page_sender.c.obj
+.PHONY : src/pages/page_sender.c.obj
+
+src/pages/page_sender.i: src/pages/page_sender.c.i
+.PHONY : src/pages/page_sender.i
+
+# target to preprocess a source file
+src/pages/page_sender.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/page_sender.c.i
+.PHONY : src/pages/page_sender.c.i
+
+src/pages/page_sender.s: src/pages/page_sender.c.s
+.PHONY : src/pages/page_sender.s
+
+# target to generate assembly for a file
+src/pages/page_sender.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/page_sender.c.s
+.PHONY : src/pages/page_sender.c.s
+
 src/pages/page_two.obj: src/pages/page_two.c.obj
 .PHONY : src/pages/page_two.obj
 
@@ -224,6 +296,54 @@ src/pages/page_two.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/page_two.c.s
 .PHONY : src/pages/page_two.c.s
 
+src/pages/sender_window.obj: src/pages/sender_window.c.obj
+.PHONY : src/pages/sender_window.obj
+
+# target to build an object file
+src/pages/sender_window.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/sender_window.c.obj
+.PHONY : src/pages/sender_window.c.obj
+
+src/pages/sender_window.i: src/pages/sender_window.c.i
+.PHONY : src/pages/sender_window.i
+
+# target to preprocess a source file
+src/pages/sender_window.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/sender_window.c.i
+.PHONY : src/pages/sender_window.c.i
+
+src/pages/sender_window.s: src/pages/sender_window.c.s
+.PHONY : src/pages/sender_window.s
+
+# target to generate assembly for a file
+src/pages/sender_window.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/sender_window.c.s
+.PHONY : src/pages/sender_window.c.s
+
+src/processor.obj: src/processor.c.obj
+.PHONY : src/processor.obj
+
+# target to build an object file
+src/processor.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/processor.c.obj
+.PHONY : src/processor.c.obj
+
+src/processor.i: src/processor.c.i
+.PHONY : src/processor.i
+
+# target to preprocess a source file
+src/processor.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/processor.c.i
+.PHONY : src/processor.c.i
+
+src/processor.s: src/processor.c.s
+.PHONY : src/processor.s
+
+# target to generate assembly for a file
+src/processor.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/processor.c.s
+.PHONY : src/processor.c.s
+
 # Help Target
 help:
 	@echo The following are some of the valid targets for this Makefile:
@@ -233,18 +353,33 @@ help:
 	@echo ... edit_cache
 	@echo ... rebuild_cache
 	@echo ... sdl_app
+	@echo ... src/app_state.obj
+	@echo ... src/app_state.i
+	@echo ... src/app_state.s
 	@echo ... src/main.obj
 	@echo ... src/main.i
 	@echo ... src/main.s
+	@echo ... src/memory.obj
+	@echo ... src/memory.i
+	@echo ... src/memory.s
 	@echo ... src/pages/page_main.obj
 	@echo ... src/pages/page_main.i
 	@echo ... src/pages/page_main.s
 	@echo ... src/pages/page_one.obj
 	@echo ... src/pages/page_one.i
 	@echo ... src/pages/page_one.s
+	@echo ... src/pages/page_sender.obj
+	@echo ... src/pages/page_sender.i
+	@echo ... src/pages/page_sender.s
 	@echo ... src/pages/page_two.obj
 	@echo ... src/pages/page_two.i
 	@echo ... src/pages/page_two.s
+	@echo ... src/pages/sender_window.obj
+	@echo ... src/pages/sender_window.i
+	@echo ... src/pages/sender_window.s
+	@echo ... src/processor.obj
+	@echo ... src/processor.i
+	@echo ... src/processor.s
 .PHONY : help
 
 

@@ -154,6 +154,9 @@ CMAKE_RC_FLAGS_RELWITHDEBINFO:STRING=
 //Path to a program.
 CMAKE_READELF:FILEPATH=C:/msys64/mingw64/bin/readelf.exe
 
+//No help, variable specified on the command line.
+CMAKE_SH:UNINITIALIZED=CMAKE_SH-NOTFOUND
+
 //Flags used by the linker during the creation of shared libraries
 // during all build types.
 CMAKE_SHARED_LINKER_FLAGS:STRING=
@@ -318,7 +321,7 @@ CMAKE_GENERATOR_PLATFORM:INTERNAL=
 CMAKE_GENERATOR_TOOLSET:INTERNAL=
 //Source directory with the top level CMakeLists.txt file for this
 // project
-CMAKE_HOME_DIRECTORY:INTERNAL=C:/Users/Emmanuel Chavarría/Documents/GitHub/Proyecto-1-SO
+CMAKE_HOME_DIRECTORY:INTERNAL=C:/Users/EMMANU~1/Documents/GitHub/Proyecto-1-SO
 //ADVANCED property for variable: CMAKE_LINKER
 CMAKE_LINKER-ADVANCED:INTERNAL=1
 //Name of CMakeLists files to read

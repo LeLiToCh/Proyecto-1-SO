@@ -12,6 +12,7 @@
     },
     "files.associations": {
         "windows.h": "c",
-        "sdl_ttf.h": "c"
+        "sdl_ttf.h": "c",
+        "format": "c"
     }
 }

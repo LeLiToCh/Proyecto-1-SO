@@ -75,11 +75,17 @@ if(NOT SDL2_LIBRARIES OR NOT SDL2_TTF_LIBRARIES)
 endif()
 
 # Sources
+
 set(SOURCE_FILES
   src/main.c
+  src/memory.c
+  src/processor.c
   src/pages/page_main.c
   src/pages/page_one.c
   src/pages/page_two.c
+  src/pages/page_sender.c
+  src/pages/sender_window.c
+  src/app_state.c
 )
 
 add_executable(sdl_app ${SOURCE_FILES})

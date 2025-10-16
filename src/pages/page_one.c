@@ -2,6 +2,9 @@
 #include <stdbool.h>   // <-- debe ir PRIMERO de todo
 #include "page_one.h"
 #include "page_main.h" // para obtener modo seleccionado en pantalla principal
+#include "memory.h"    // backend de memoria
+#include "processor.h" // procesado de archivo a memoria
+#include "app_state.h"
 #include <stdio.h>
 #include <string.h>
 #ifdef _WIN32
@@ -13,6 +16,7 @@
 // UI element rects
 static SDL_Rect back = {20,20,100,40};
 static SDL_Rect continue_btn = {0,0,160,50};
+static bool continue_disabled = false; // se deshabilita tras primera carga
 
 // Inputs state
 #define MAX_TEXT 256
@@ -27,6 +31,18 @@ static int cantidad = 1;
 static SDL_Rect mode_rect = {0,0,220,30};
 static char mode_text[16] = ""; // guardaremos cadena de hasta 9 dígitos
 static bool mode_active = false;
+
+static void reset_page_state(void) {
+    identificador[0] = '\0';
+    filepath[0] = '\0';
+    mode_text[0] = '\0';
+    cantidad = 1;
+    identificador_active = filepath_active = mode_active = false;
+    continue_disabled = false;
+    SDL_StopTextInput();
+    // Limpiar memoria para que no se guarde nada
+    memory_clear();
+}
 
 // helper: open native file dialog into out buffer (UTF-8). Returns 1 on success.
 static int open_file_dialog(char *out, size_t outlen) {
@@ -76,17 +92,29 @@ static bool pt_in_rect(int x, int y, SDL_Rect *r) {
 
 void page_one_handle_event(SDL_Event *e, int *out_next_page) {
     if (e->type == SDL_MOUSEBUTTONDOWN && e->button.button == SDL_BUTTON_LEFT) {
+        // Asegurar que los rects dependientes del layout coincidan con el render
+        // para que el primer click funcione (evita tener que hacer doble click).
+        continue_btn.x = 120; continue_btn.y = 540; continue_btn.w = 160; continue_btn.h = 50;
         int mx = e->button.x;
         int my = e->button.y;
         if (pt_in_rect(mx,my,&back)) {
+            // Restablecer estado e ir a la pantalla principal
+            reset_page_state();
             *out_next_page = 0; // PAGE_MAIN
             return;
         }
 
-        if (pt_in_rect(mx,my,&continue_btn)) {
+    if (pt_in_rect(mx,my,&continue_btn) && !continue_disabled) {
             // print values to stdout
             printf("Identificador: %s\n", identificador);
             printf("Cantidad: %d\n", cantidad);
+         // Inicializar memoria compartida con 'identificador' y 'cantidad'
+         if (cantidad <= 0) cantidad = 1; // validar
+         bool created = false;
+         bool ok = memory_init_shared(identificador[0] ? identificador : "mem", (size_t)cantidad, &created);
+         printf("Memoria compartida %s (capacidad=%zu): %s\n",
+             created ? "creada" : "adjunta",
+             memory_capacity(), ok ? "OK" : "ERROR");
             // Imprimir modo desde la pantalla principal (botones)
             const char *exec_mode_main = page_main_get_execution_mode();
             printf("Modo de ejecucion (inicio): %s\n", exec_mode_main);
@@ -94,6 +122,12 @@ void page_one_handle_event(SDL_Event *e, int *out_next_page) {
             printf("Clave de 9 bits: %s\n", mode_text[0] ? mode_text : "(vacia)");
             printf("Archivo: %s\n", filepath);
             fflush(stdout);
+            // Guardar estado para la página sender y cambiar a ella
+            bool automatic = true;
+            if (exec_mode_main && (strcmp(exec_mode_main, "Manual") == 0)) automatic = false;
+            app_state_set(identificador, (size_t)cantidad, mode_text, automatic);
+            *out_next_page = 3; // PAGE_SENDER
+            continue_disabled = true;
             return;
         }
 
@@ -102,8 +136,9 @@ void page_one_handle_event(SDL_Event *e, int *out_next_page) {
     /* cantidad_box unused in event handler; used in render */
     SDL_Rect up = {660,210,30,30};
     SDL_Rect down = {660,250,30,30};
-    SDL_Rect fpbox = {120,490,480,30};
-    SDL_Rect search_btn = { fpbox.x + fpbox.w + 8, fpbox.y, 80, fpbox.h };
+    // file selector moved to sender page
+    SDL_Rect fpbox = {0,0,0,0};
+    SDL_Rect search_btn = {0,0,0,0};
     // Campo de modo (coincidir con render)
     mode_rect.x = 120; mode_rect.y = 280; mode_rect.w = 300; mode_rect.h = 30;
     if (pt_in_rect(mx,my,&idbox)) {
@@ -117,14 +152,6 @@ void page_one_handle_event(SDL_Event *e, int *out_next_page) {
         identificador_active = false;
         filepath_active = false;
         SDL_StartTextInput();
-    } else if (pt_in_rect(mx,my,&fpbox) || pt_in_rect(mx,my,&search_btn)) {
-        // open native file dialog and fill filepath
-        char sel[MAX_TEXT] = "";
-        if (open_file_dialog(sel, sizeof(sel))) {
-            strncpy(filepath, sel, MAX_TEXT-1);
-            filepath[MAX_TEXT-1] = '\0';
-            filepath_active = true; // highlight newly selected file
-        }
     } else {
         // clicked elsewhere -> stop text input
         if (identificador_active || filepath_active || mode_active) SDL_StopTextInput();
@@ -133,9 +160,15 @@ void page_one_handle_event(SDL_Event *e, int *out_next_page) {
         mode_active = false;
     }
 
-    // number up/down
-    if (pt_in_rect(mx,my,&up)) { cantidad++; if (cantidad>1000) cantidad=1000; }
-    if (pt_in_rect(mx,my,&down)) { cantidad--; if (cantidad<0) cantidad=0; }
+    // number up/down (change by 50)
+    if (pt_in_rect(mx,my,&up)) {
+        cantidad += 50;
+        if (cantidad > 1000000) cantidad = 1000000; // raise upper bound for convenience
+    }
+    if (pt_in_rect(mx,my,&down)) {
+        cantidad -= 50;
+        if (cantidad < 0) cantidad = 0;
+    }
 
         // sin dropdown: no acción adicional aquí
 
@@ -309,42 +342,10 @@ void page_one_render(SDL_Renderer *ren, TTF_Font *font) {
             SDL_DestroyTexture(tsel); SDL_FreeSurface(sel);
         }
 
-        // file selector label and box
-        SDL_Surface *flab = TTF_RenderUTF8_Blended(font, "Selecciona tu archivo para procesar", col);
-        SDL_Texture *tflab = SDL_CreateTextureFromSurface(ren, flab);
-        SDL_QueryTexture(tflab, NULL, NULL, &tw, &th);
-        SDL_Rect d4 = { fp_label.x, fp_label.y, tw, th };
-        SDL_RenderCopy(ren, tflab, NULL, &d4);
-        SDL_DestroyTexture(tflab); SDL_FreeSurface(flab);
-
-    SDL_SetRenderDrawColor(ren, 255,255,255,255);
-    SDL_RenderFillRect(ren, &fpbox);
-    // highlight file box if active
-    if (filepath_active) SDL_SetRenderDrawColor(ren, 30,144,255,255); else SDL_SetRenderDrawColor(ren, 200,200,200,255);
-    SDL_RenderDrawRect(ren, &fpbox);
-    // draw search button
-    SDL_Rect search_btn = { fpbox.x + fpbox.w + 8, fpbox.y, 80, fpbox.h };
-    SDL_SetRenderDrawColor(ren, 100,149,237,255);
-    SDL_RenderFillRect(ren, &search_btn);
-    if (strlen(filepath)>0) {
-        SDL_Surface *fp = TTF_RenderUTF8_Blended(font, filepath, col);
-        SDL_Texture *tfp = SDL_CreateTextureFromSurface(ren, fp);
-        SDL_QueryTexture(tfp, NULL, NULL, &tw, &th);
-        // clip text if too long (just render start)
-        SDL_Rect dfp = { fpbox.x + 6, fpbox.y + (fpbox.h - th)/2, tw, th };
-        SDL_RenderCopy(ren, tfp, NULL, &dfp);
-        SDL_DestroyTexture(tfp); SDL_FreeSurface(fp);
-    }
-    // search button label
-    SDL_Surface *sbtn = TTF_RenderUTF8_Blended(font, "Buscar", (SDL_Color){255,255,255,255});
-    SDL_Texture *tsbtn = SDL_CreateTextureFromSurface(ren, sbtn);
-    SDL_QueryTexture(tsbtn, NULL, NULL, &tw, &th);
-    SDL_Rect ds = { search_btn.x + (search_btn.w - tw)/2, search_btn.y + (search_btn.h - th)/2, tw, th };
-    SDL_RenderCopy(ren, tsbtn, NULL, &ds);
-    SDL_DestroyTexture(tsbtn); SDL_FreeSurface(sbtn);
+        // file selector moved to sender page (removed from here)
 
         // Continue button
-        SDL_SetRenderDrawColor(ren, 34,139,34,255);
+    if (continue_disabled) SDL_SetRenderDrawColor(ren, 120,120,120,255); else SDL_SetRenderDrawColor(ren, 34,139,34,255);
         SDL_RenderFillRect(ren, &continue_btn);
         SDL_SetRenderDrawColor(ren, 255,255,255,255);
         SDL_Surface *cont = TTF_RenderUTF8_Blended(font, "Continuar", (SDL_Color){255,255,255,255});
