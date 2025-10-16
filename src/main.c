@@ -43,7 +43,21 @@ int main(int argc, char **argv) {
     }
 
     // Load font - expects "font.ttf" in current working directory
-    TTF_Font *font = TTF_OpenFont("C:\\Users\\Emmanuel Chavarría\\Documents\\GitHub\\Proyecto-1-SO\\font.ttf", 24);
+    TTF_Font *font = NULL;
+    const char *font_candidates[] = {
+        "font.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "/usr/share/fonts/truetype/freefont/FreeSans.ttf",
+        NULL
+    };
+    // Try loading from multiple common locations
+    for (int i = 0; font_candidates[i] != NULL; ++i) {
+        font = TTF_OpenFont(font_candidates[i], 24);
+        if (font) {
+            printf("[INFO] Using font: %s\n", font_candidates[i]);
+            break;
+        }
+    }
     if (!font) {
         fprintf(stderr, "Failed to open font.ttf: %s\n", TTF_GetError());
         SDL_DestroyRenderer(ren);

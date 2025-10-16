@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include <string.h>
 #include "processor.h"
+#include "receptor.h"
+#include "finalizador.h"
 #include "app_state.h"
 #ifdef _WIN32
 #include <windows.h>
@@ -38,10 +40,14 @@ void sender_window_start_async(const char *identificador, int cantidad, const ch
         SDL_Event e;
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT) {
+                // Invocar finalizador antes de cerrar la ventana
+                finalizador_shutdown_system(app_state_get_cantidad());
                 running = 0;
             } else if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT) {
                 int mx = e.button.x, my = e.button.y;
                 if (mx >= close_btn.x && mx <= close_btn.x + close_btn.w && my >= close_btn.y && my <= close_btn.y + close_btn.h) {
+                    // Invocar finalizador antes de cerrar la ventana
+                    finalizador_shutdown_system(app_state_get_cantidad());
                     running = 0;
                 } else if (mx >= newinst_btn.x && mx <= newinst_btn.x + newinst_btn.w && my >= newinst_btn.y && my <= newinst_btn.y + newinst_btn.h) {
                     (void)++g_instance_counter;
@@ -84,6 +90,7 @@ void sender_window_start_async(const char *identificador, int cantidad, const ch
                         bool ok = memory_init_shared(ident, cantidad, &created);
                         printf("[window] Memoria compartida %s (capacidad=%zu): %s\n", created ? "creada" : "adjunta", memory_capacity(), ok ? "OK" : "ERROR");
                         if (ok) {
+                            receptor_start_async(key_to_use, automatic);
                             processor_start_async(file_path, key_to_use, automatic);
                         } else {
                             printf("[window] ERROR: no se pudo inicializar/adjuntar memoria compartida. Aborting procesamiento.\n");

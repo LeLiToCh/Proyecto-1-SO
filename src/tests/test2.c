@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
 	}
 
     // 3. INICIO DEL RECEPTOR (Hilo Consumidor Asíncrono)
-	if (!receptor_start_async(outpath, key_bits, true)) {
+	if (!receptor_start_async(key_bits, true)) {
 		fprintf(stderr, "[TEST] receptor_start_async failed\n");
 		memory_shutdown();
 		SDL_Quit();

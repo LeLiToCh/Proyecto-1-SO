@@ -1,5 +1,6 @@
 #include "processor.h"
 #include "memory.h"
+#include "monitor.h"
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
@@ -105,6 +106,7 @@ static int processor_thread(void *data) {
     printf("\n================= FIN DE PROCESO =================\n");
     memory_debug_print_snapshot();
     free(a);
+    monitor_processor_stopped();
     return 0;
 }
 
@@ -117,6 +119,7 @@ bool processor_start_async(const char *filepath, const char *key_bits, bool auto
     strncat(a->key, key_bits ? key_bits : "", sizeof(a->key)-1);
     a->automatic = automatic ? 1 : 0;
     SDL_Thread *th = SDL_CreateThread(processor_thread, "processor_thread", a);
+    monitor_processor_started();
     if (!th) { free(a); return false; }
     SDL_DetachThread(th);
     return true;

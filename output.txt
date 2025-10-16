@@ -1,0 +1,3 @@
+Hola mundo desde Proyecto SO 2025.
+Prueba de emisor y receptor.
+ASCII y XOR con clave de 9 bits.

@@ -36,7 +36,7 @@ int main(int argc, char **argv) {
     printf("Modo: Automatico\\n");
     printf("-------------------------------\\n");
 
-	if (!receptor_start_async(outpath, key_bits, true)) {
+	if (!receptor_start_async(key_bits, true)) {
 		fprintf(stderr, "receptor_start_async failed\\n");
 		memory_shutdown();
 		SDL_Quit();

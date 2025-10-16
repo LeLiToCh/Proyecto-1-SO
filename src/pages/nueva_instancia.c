@@ -1,6 +1,8 @@
 #include "nueva_instancia.h"
 #include "emisor.h"
 #include "processor.h"
+#include "receptor.h"
+#include "finalizador.h"
 #include "app_state.h"
 #include "memory.h"
 #include <stddef.h>
@@ -61,6 +63,8 @@ void page_sender_handle_event(SDL_Event *e, int *out_next_page) {
     SDL_Rect newinst_btn = { back.x + back.w + 10, back.y, 180, back.h };
 
         if (mx >= back.x && mx <= back.x + back.w && my >= back.y && my <= back.y + back.h) {
+            // Invocar finalizador antes de cerrar la ventana
+            finalizador_shutdown_system(app_state_get_cantidad());
             // go back to inicializador
             *out_next_page = 1; // PAGE_ONE
             return;
@@ -101,6 +105,7 @@ void page_sender_handle_event(SDL_Event *e, int *out_next_page) {
             bool created = false;
             bool ok = memory_init_shared(ident[0] ? ident : "mem", cantidad, &created);
             printf("Memoria compartida %s (capacidad=%zu): %s\n", created ? "creada" : "adjunta", memory_capacity(), ok ? "OK" : "ERROR");
+            receptor_start_async(clave, automatic);
             processor_start_async(file_path, clave, automatic);
         }
     }

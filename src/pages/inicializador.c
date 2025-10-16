@@ -4,6 +4,8 @@
 #include "modo_operacion.h" // para obtener modo seleccionado en pantalla principal
 #include "memory.h"    // backend de memoria
 #include "processor.h" // procesado de archivo a memoria
+#include "receptor.h"
+#include "finalizador.h"
 #include "app_state.h"
 #include <stdio.h>
 #include <string.h>
