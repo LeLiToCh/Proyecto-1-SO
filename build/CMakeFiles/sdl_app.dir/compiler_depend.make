@@ -794,6 +794,11 @@ CMakeFiles/sdl_app.dir/src/pages/emisor.c.o: ../src/pages/emisor.c \
   /usr/include/SDL2/SDL_ttf.h \
   /usr/include/SDL2/SDL.h \
   ../src/processor.h \
+  ../src/receptor.h \
+  ../src/finalizador.h \
+  ../src/memory.h \
+  ../src/processor.h \
+  ../src/receptor.h \
   ../src/app_state.h
 
 CMakeFiles/sdl_app.dir/src/pages/inicializador.c.o: ../src/pages/inicializador.c \
@@ -1014,6 +1019,11 @@ CMakeFiles/sdl_app.dir/src/pages/inicializador.c.o: ../src/pages/inicializador.c
   ../src/pages/modo_operacion.h \
   ../src/memory.h \
   ../src/processor.h \
+  ../src/receptor.h \
+  ../src/finalizador.h \
+  ../src/memory.h \
+  ../src/processor.h \
+  ../src/receptor.h \
   ../src/app_state.h
 
 CMakeFiles/sdl_app.dir/src/pages/modo_operacion.c.o: ../src/pages/modo_operacion.c \
@@ -1448,6 +1458,11 @@ CMakeFiles/sdl_app.dir/src/pages/nueva_instancia.c.o: ../src/pages/nueva_instanc
   ../src/pages/emisor.h \
   /usr/lib/gcc/x86_64-linux-gnu/11/include/stdbool.h \
   ../src/processor.h \
+  ../src/receptor.h \
+  ../src/finalizador.h \
+  ../src/memory.h \
+  ../src/processor.h \
+  ../src/receptor.h \
   ../src/app_state.h \
   ../src/memory.h
 

@@ -11,6 +11,6 @@ bool process_memory_to_output(const char *filepath, const char *key_bits, bool a
 
 // Inicia la recepción en un hilo en segundo plano.
 // Devuelve true si el hilo se creó correctamente.
-bool receptor_start_async(const char *filepath, const char *key_bits, bool automatic);
+bool receptor_start_async(const char *key_bits, bool automatic);
 
 #endif // RECEPTOR_H

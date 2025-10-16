@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include <string.h>
 #include "processor.h"
+#include "receptor.h"
+#include "finalizador.h"
 #include "app_state.h"
 #ifdef _WIN32
 #include <windows.h>
@@ -84,6 +86,7 @@ void sender_window_start_async(const char *identificador, int cantidad, const ch
                         bool ok = memory_init_shared(ident, cantidad, &created);
                         printf("[window] Memoria compartida %s (capacidad=%zu): %s\n", created ? "creada" : "adjunta", memory_capacity(), ok ? "OK" : "ERROR");
                         if (ok) {
+                            receptor_start_async(key_to_use, automatic);
                             processor_start_async(file_path, key_to_use, automatic);
                         } else {
                             printf("[window] ERROR: no se pudo inicializar/adjuntar memoria compartida. Aborting procesamiento.\n");

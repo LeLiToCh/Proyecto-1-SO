@@ -14,7 +14,8 @@
         "windows.h": "c",
         "sdl_ttf.h": "c",
         "format": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "processor.h": "c"
     },
     // Help C/C++ extension find includes using CMake's compile_commands.json
     "C_Cpp.default.compileCommands": "${workspaceFolder}/build/compile_commands.json",

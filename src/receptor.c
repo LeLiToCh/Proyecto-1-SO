@@ -41,7 +41,7 @@ static void print_decoded_entry(const MemEntry *e, uint8_t key) {
     // Mostrar el texto reconstruido en tiempo real
     printf(" -> Archivo reconstruido: \x1b[36m%c\x1b[0m\n", decoded_char);
 
-    memory_debug_print_snapshot();
+    //memory_debug_print_snapshot();
     fflush(stdout);
 }
 
@@ -101,9 +101,6 @@ bool process_memory_to_output(const char *filepath, const char *key_bits, bool a
             char decoded_char = (char)(e.ascii ^ key);
             fputc(decoded_char, f);
             fflush(f);
-            // Mostrar snapshot de memoria después de cada lectura
-            // memory_debug_print_snapshot();
-            // fflush(stdout);
 
             if (!automatic) {
                 printf("Presione Enter para leer el siguiente caracter...\n");
@@ -147,12 +144,15 @@ static int receptor_thread(void *data){
     return 0;
 }
 
-bool receptor_start_async(const char *filepath, const char *key_bits, bool automatic) {
-    if (!filepath || !*filepath) return false;
+bool receptor_start_async(const char *key_bits, bool automatic) {
+    const char *output_filename = "output.txt";
+    
     ReceptorArgs *a = (ReceptorArgs *)malloc(sizeof(ReceptorArgs));
     if (!a) return false;
-    strncpy(a->path, filepath, sizeof(a->path)-1);
+
+    strncpy(a->path, output_filename, sizeof(a->path)-1);
     a->path[sizeof(a->path)-1] = '\0';
+
     strncpy(a->key, key_bits ? key_bits : "", sizeof(a->key)-1);
     a->key[sizeof(a->key)-1] = '\0';
     a->automatic = automatic ? 1 : 0;

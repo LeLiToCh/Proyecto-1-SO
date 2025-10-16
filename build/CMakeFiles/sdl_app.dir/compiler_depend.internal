@@ -799,6 +799,11 @@ CMakeFiles/sdl_app.dir/src/pages/emisor.c.o
  /usr/include/SDL2/SDL_ttf.h
  /usr/include/SDL2/SDL.h
  /home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/src/processor.h
+ /home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/src/receptor.h
+ /home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/src/finalizador.h
+ /home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/src/memory.h
+ /home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/src/processor.h
+ /home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/src/receptor.h
  /home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/src/app_state.h
 
 CMakeFiles/sdl_app.dir/src/pages/inicializador.c.o
@@ -1020,6 +1025,11 @@ CMakeFiles/sdl_app.dir/src/pages/inicializador.c.o
  /home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/src/pages/modo_operacion.h
  /home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/src/memory.h
  /home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/src/processor.h
+ /home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/src/receptor.h
+ /home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/src/finalizador.h
+ /home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/src/memory.h
+ /home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/src/processor.h
+ /home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/src/receptor.h
  /home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/src/app_state.h
 
 CMakeFiles/sdl_app.dir/src/pages/modo_operacion.c.o
@@ -1456,6 +1466,11 @@ CMakeFiles/sdl_app.dir/src/pages/nueva_instancia.c.o
  /home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/src/pages/emisor.h
  /usr/lib/gcc/x86_64-linux-gnu/11/include/stdbool.h
  /home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/src/processor.h
+ /home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/src/receptor.h
+ /home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/src/finalizador.h
+ /home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/src/memory.h
+ /home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/src/processor.h
+ /home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/src/receptor.h
  /home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/src/app_state.h
  /home/jose/Documents/TEC/2025/II Semestre/CE4303 -Principios de sistemas operativos/Proyectos/Proyecto-1-SO/src/memory.h
 
