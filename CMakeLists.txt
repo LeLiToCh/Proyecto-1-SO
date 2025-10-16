@@ -83,6 +83,8 @@ set(SOURCE_FILES
   src/main.c
   src/memory.c
   src/processor.c
+  src/receptor.c
+  src/finalizador.c
   src/pages/modo_operacion.c
   src/pages/inicializador.c
   src/pages/page_two.c
