@@ -27,14 +27,14 @@ bool process_file_into_memory(const char *filepath, const char *key_bits, bool a
     extern size_t app_state_get_cantidad(void);
     extern const char* app_state_get_clave(void);
     extern bool app_state_get_automatic(void);
-    printf("[INFO] --- INICIO DE PROCESO ---\n");
-    printf("Identificador: %s\n", app_state_get_identificador());
-    printf("Cantidad: %zu\n", app_state_get_cantidad());
-    printf("Clave: %s\n", app_state_get_clave());
-    printf("Semilla (key_bits): %s\n", key_bits);
-    printf("Archivo: %s\n", filepath);
-    printf("Modo: %s\n", automatic ? "Automatico" : "Manual");
-    printf("-------------------------------\n");
+    printf("\n==================================================\n");
+    printf(" INICIO DE PROCESO\n");
+    printf("--------------------------------------------------\n");
+    printf(" Identificador : %s\n", app_state_get_identificador());
+    printf(" Cantidad      : %zu\n", app_state_get_cantidad());
+    printf(" Archivo       : %s\n", filepath);
+    printf(" Modo          : %s\n", automatic ? "Automatico" : "Manual");
+    printf(" Semilla bits  : %s\n", key_bits);
     FILE *f = NULL;
 #ifdef _WIN32
     // Convert UTF-8 path to UTF-16 and use _wfopen to handle accents
@@ -54,10 +54,13 @@ bool process_file_into_memory(const char *filepath, const char *key_bits, bool a
     }
     if (!f) { perror("[processor] fopen"); return false; }
     uint8_t key = key_from_bits(key_bits);
-    printf("[processor] Clave (8-bit) usada: 0x%02X\n", key);
-    // Print table header once (add KEY to identify origin per row)
-    printf("%-6s %-6s %-6s %-12s %-6s\n", "ASCII", "INDEX", "HORA", "ENCODING", "KEY");
+    printf(" Clave (8-bit) : 0x%02X\n", key);
+    printf("--------------------------------------------------\n");
+    printf(" Paso a paso (uno por caracter):\n");
+    printf("  #  |        FECHA-HORA       | IDX | IN  | ENC | KEY | MEM\n");
+    printf("-----+-------------------------+-----+-----+-----+-----+---------\n");
     int c;
+    size_t line_no = 0;
     while ((c = fgetc(f)) != EOF) {
         // Only process printable and common whitespace; others can be skipped or stored as-is
         uint8_t orig = (uint8_t)c;
@@ -69,10 +72,14 @@ bool process_file_into_memory(const char *filepath, const char *key_bits, bool a
             fclose(f);
             return false;
         }
-    // Pretty print row under header, including the constant KEY used by this writer
-    printf("%-6u %-6u %-6llu 0x%02X   0x%02X\n", (unsigned)orig, (unsigned)idx, (unsigned long long)ts, enc, (unsigned)key);
-        // Imprimir snapshot de memoria después de cada escritura
-        memory_debug_print_snapshot();
+        // Pretty print row under header with formatted local time
+        char when[32];
+        memory_format_timestamp(ts, when, sizeof(when));
+     size_t cap = memory_capacity();
+     size_t sz  = memory_size();
+     ++line_no;
+     printf(" %3zu | %-23s | %3u | %3u | 0x%02X | 0x%02X | %2zu/%-2zu\n",
+         line_no, when, (unsigned)idx, (unsigned)orig, enc, (unsigned)key, sz, cap);
         fflush(stdout);
         if (!automatic) {
             // Wait for Enter to proceder a next character
@@ -95,7 +102,7 @@ static int processor_thread(void *data) {
     ProcArgs *a = (ProcArgs*)data;
     process_file_into_memory(a->path, a->key, a->automatic ? true : false);
     // Al terminar, imprimir resumen de memoria
-    printf("[INFO] --- FIN DE PROCESO ---\n");
+    printf("\n================= FIN DE PROCESO =================\n");
     memory_debug_print_snapshot();
     free(a);
     return 0;

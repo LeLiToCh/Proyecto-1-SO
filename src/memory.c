@@ -208,6 +208,29 @@ static uint64_t now_ms(void) {
 #endif
 }
 
+// Convert ms since Unix epoch to local time string "YYYY-MM-DD HH:MM:SS".
+void memory_format_timestamp(uint64_t ts_ms, char *out, size_t outsz) {
+    if (!out || outsz == 0) return;
+    out[0] = '\0';
+#ifdef _WIN32
+    // Split into seconds and ms, then convert to SYSTEMTIME local time
+    time_t sec = (time_t)(ts_ms / 1000ULL);
+    struct tm lt;
+    localtime_s(&lt, &sec);
+    // Format: YYYY-MM-DD HH:MM:SS
+    snprintf(out, outsz, "%04d-%02d-%02d %02d:%02d:%02d",
+             lt.tm_year + 1900, lt.tm_mon + 1, lt.tm_mday,
+             lt.tm_hour, lt.tm_min, lt.tm_sec);
+#else
+    time_t sec = (time_t)(ts_ms / 1000ULL);
+    struct tm lt;
+    localtime_r(&sec, &lt);
+    snprintf(out, outsz, "%04d-%02d-%02d %02d:%02d:%02d",
+             lt.tm_year + 1900, lt.tm_mon + 1, lt.tm_mday,
+             lt.tm_hour, lt.tm_min, lt.tm_sec);
+#endif
+}
+
 static bool memory_write_core(uint8_t ascii, uint8_t key_used, uint32_t *out_index, uint64_t *out_ts) {
     uint64_t ts = now_ms();
     if (g_is_shared) {
@@ -495,7 +518,8 @@ void memory_debug_print_snapshot(void) {
         size_t cur = g_sh->head;
         for (size_t i = 0; i < g_sh->size; ++i) {
             MemEntry e = g_sh_data[cur];
-            printf("  #%02zu slot=%02zu ascii=%3u ts=%llu key=0x%02X\n", i, cur, (unsigned)e.ascii, (unsigned long long)e.timestamp_ms, (unsigned)e.key_used);
+            char when[32]; memory_format_timestamp(e.timestamp_ms, when, sizeof(when));
+            printf("  #%02zu slot=%02zu ascii=%3u time=%s key=0x%02X\n", i, cur, (unsigned)e.ascii, when, (unsigned)e.key_used);
             cur = (cur + 1) % g_sh->cap;
         }
     ReleaseSemaphore(g_hControl, 1, NULL);
@@ -505,7 +529,8 @@ void memory_debug_print_snapshot(void) {
         size_t cur = g_sh->head;
         for (size_t i = 0; i < g_sh->size; ++i) {
             MemEntry e = g_sh_data[cur];
-            printf("  #%02zu slot=%02zu ascii=%3u ts=%llu key=0x%02X\n", i, cur, (unsigned)e.ascii, (unsigned long long)e.timestamp_ms, (unsigned)e.key_used);
+            char when[32]; memory_format_timestamp(e.timestamp_ms, when, sizeof(when));
+            printf("  #%02zu slot=%02zu ascii=%3u time=%s key=0x%02X\n", i, cur, (unsigned)e.ascii, when, (unsigned)e.key_used);
             cur = (cur + 1) % g_sh->cap;
         }
     sem_post(g_sem_ctrl);
@@ -514,7 +539,8 @@ void memory_debug_print_snapshot(void) {
         size_t cur = g_mem.head;
         for (size_t i = 0; i < g_mem.size; ++i) {
             MemEntry e = g_mem.buf[cur];
-            printf("  #%02zu slot=%02zu ascii=%3u ts=%llu key=0x%02X\n", i, cur, (unsigned)e.ascii, (unsigned long long)e.timestamp_ms, (unsigned)e.key_used);
+            char when[32]; memory_format_timestamp(e.timestamp_ms, when, sizeof(when));
+            printf("  #%02zu slot=%02zu ascii=%3u time=%s key=0x%02X\n", i, cur, (unsigned)e.ascii, when, (unsigned)e.key_used);
             cur = (cur + 1) % g_mem.cap;
         }
     }
