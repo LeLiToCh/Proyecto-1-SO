@@ -1,0 +1,8 @@
+build/
+CMakeFiles/
+CMakeCache.txt
+*.obj
+*.exe
+*.pdb
+*.user
+.vscode/
