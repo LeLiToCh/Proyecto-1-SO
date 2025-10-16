@@ -1,4 +1,4 @@
-#include "page_main.h"
+#include "modo_operacion.h"
 #include <string.h>
 
 // We'll compute button positions based on renderer viewport to center them

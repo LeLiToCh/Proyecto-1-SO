@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
 project(sdl_app C)
 
+# Generate compile_commands.json for better IntelliSense integration in VS Code
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 # Prefer pkg-config when available (good for MSYS2 / Linux)
@@ -80,11 +83,11 @@ set(SOURCE_FILES
   src/main.c
   src/memory.c
   src/processor.c
-  src/pages/page_main.c
-  src/pages/page_one.c
+  src/pages/modo_operacion.c
+  src/pages/inicializador.c
   src/pages/page_two.c
-  src/pages/page_sender.c
-  src/pages/sender_window.c
+  src/pages/nueva_instancia.c
+  src/pages/emisor.c
   src/app_state.c
 )
 

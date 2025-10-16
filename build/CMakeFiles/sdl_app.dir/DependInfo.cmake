@@ -11,11 +11,11 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "C:/Users/EMMANU~1/Documents/GitHub/Proyecto-1-SO/src/app_state.c" "CMakeFiles/sdl_app.dir/src/app_state.c.obj" "gcc" "CMakeFiles/sdl_app.dir/src/app_state.c.obj.d"
   "C:/Users/EMMANU~1/Documents/GitHub/Proyecto-1-SO/src/main.c" "CMakeFiles/sdl_app.dir/src/main.c.obj" "gcc" "CMakeFiles/sdl_app.dir/src/main.c.obj.d"
   "C:/Users/EMMANU~1/Documents/GitHub/Proyecto-1-SO/src/memory.c" "CMakeFiles/sdl_app.dir/src/memory.c.obj" "gcc" "CMakeFiles/sdl_app.dir/src/memory.c.obj.d"
-  "C:/Users/EMMANU~1/Documents/GitHub/Proyecto-1-SO/src/pages/page_main.c" "CMakeFiles/sdl_app.dir/src/pages/page_main.c.obj" "gcc" "CMakeFiles/sdl_app.dir/src/pages/page_main.c.obj.d"
-  "C:/Users/EMMANU~1/Documents/GitHub/Proyecto-1-SO/src/pages/page_one.c" "CMakeFiles/sdl_app.dir/src/pages/page_one.c.obj" "gcc" "CMakeFiles/sdl_app.dir/src/pages/page_one.c.obj.d"
-  "C:/Users/EMMANU~1/Documents/GitHub/Proyecto-1-SO/src/pages/page_sender.c" "CMakeFiles/sdl_app.dir/src/pages/page_sender.c.obj" "gcc" "CMakeFiles/sdl_app.dir/src/pages/page_sender.c.obj.d"
+  "C:/Users/EMMANU~1/Documents/GitHub/Proyecto-1-SO/src/pages/emisor.c" "CMakeFiles/sdl_app.dir/src/pages/emisor.c.obj" "gcc" "CMakeFiles/sdl_app.dir/src/pages/emisor.c.obj.d"
+  "C:/Users/EMMANU~1/Documents/GitHub/Proyecto-1-SO/src/pages/inicializador.c" "CMakeFiles/sdl_app.dir/src/pages/inicializador.c.obj" "gcc" "CMakeFiles/sdl_app.dir/src/pages/inicializador.c.obj.d"
+  "C:/Users/EMMANU~1/Documents/GitHub/Proyecto-1-SO/src/pages/modo_operacion.c" "CMakeFiles/sdl_app.dir/src/pages/modo_operacion.c.obj" "gcc" "CMakeFiles/sdl_app.dir/src/pages/modo_operacion.c.obj.d"
+  "C:/Users/EMMANU~1/Documents/GitHub/Proyecto-1-SO/src/pages/nueva_instancia.c" "CMakeFiles/sdl_app.dir/src/pages/nueva_instancia.c.obj" "gcc" "CMakeFiles/sdl_app.dir/src/pages/nueva_instancia.c.obj.d"
   "C:/Users/EMMANU~1/Documents/GitHub/Proyecto-1-SO/src/pages/page_two.c" "CMakeFiles/sdl_app.dir/src/pages/page_two.c.obj" "gcc" "CMakeFiles/sdl_app.dir/src/pages/page_two.c.obj.d"
-  "C:/Users/EMMANU~1/Documents/GitHub/Proyecto-1-SO/src/pages/sender_window.c" "CMakeFiles/sdl_app.dir/src/pages/sender_window.c.obj" "gcc" "CMakeFiles/sdl_app.dir/src/pages/sender_window.c.obj.d"
   "C:/Users/EMMANU~1/Documents/GitHub/Proyecto-1-SO/src/processor.c" "CMakeFiles/sdl_app.dir/src/processor.c.obj" "gcc" "CMakeFiles/sdl_app.dir/src/processor.c.obj.d"
   )
 

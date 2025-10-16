@@ -1,4 +1,4 @@
-// page_main.h
+// modo_operacion.h
 #ifndef PAGE_MAIN_H
 #define PAGE_MAIN_H
 

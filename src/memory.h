@@ -66,4 +66,14 @@ bool memory_init_shared(const char *name, size_t capacity, bool *out_created);
 // Shows size/capacity and, for each occupied slot: logical order, slot index, ascii, and timestamp.
 void memory_debug_print_snapshot(void);
 
+// Format a millisecond timestamp (since Unix epoch) into local PC time as "YYYY-MM-DD HH:MM:SS".
+// out must have room for at least 20 bytes (19 chars + NUL).
+void memory_format_timestamp(uint64_t ts_ms, char *out, size_t outsz);
+
+// Termination coordination (optional helpers):
+// Broadcast a termination signal to all attached processes/threads waiting on this region.
+void memory_broadcast_terminate(void);
+// Non-blocking check: returns true if a termination signal has been broadcast.
+bool memory_termination_notified(void);
+
 #endif // MEMORY_H

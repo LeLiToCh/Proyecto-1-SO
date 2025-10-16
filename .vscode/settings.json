@@ -14,5 +14,18 @@
         "windows.h": "c",
         "sdl_ttf.h": "c",
         "format": "c"
-    }
+    },
+    // Help C/C++ extension find includes using CMake's compile_commands.json
+    "C_Cpp.default.compileCommands": "${workspaceFolder}/build/compile_commands.json",
+    // Fallback include paths for MSYS2 MinGW64 (adjust if installed elsewhere)
+    "C_Cpp.default.includePath": [
+        "${workspaceFolder}/src",
+        "C:/msys64/mingw64/include",
+        "C:/msys64/mingw64/include/SDL2"
+    ],
+    // Define MSYS2/MinGW macro to match build environment
+    "C_Cpp.default.defines": [
+        "__MINGW32__",
+        "_WIN32"
+    ]
 }

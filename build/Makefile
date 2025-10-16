@@ -200,77 +200,101 @@ src/memory.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/memory.c.s
 .PHONY : src/memory.c.s
 
-src/pages/page_main.obj: src/pages/page_main.c.obj
-.PHONY : src/pages/page_main.obj
+src/pages/emisor.obj: src/pages/emisor.c.obj
+.PHONY : src/pages/emisor.obj
 
 # target to build an object file
-src/pages/page_main.c.obj:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/page_main.c.obj
-.PHONY : src/pages/page_main.c.obj
+src/pages/emisor.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/emisor.c.obj
+.PHONY : src/pages/emisor.c.obj
 
-src/pages/page_main.i: src/pages/page_main.c.i
-.PHONY : src/pages/page_main.i
+src/pages/emisor.i: src/pages/emisor.c.i
+.PHONY : src/pages/emisor.i
 
 # target to preprocess a source file
-src/pages/page_main.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/page_main.c.i
-.PHONY : src/pages/page_main.c.i
+src/pages/emisor.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/emisor.c.i
+.PHONY : src/pages/emisor.c.i
 
-src/pages/page_main.s: src/pages/page_main.c.s
-.PHONY : src/pages/page_main.s
+src/pages/emisor.s: src/pages/emisor.c.s
+.PHONY : src/pages/emisor.s
 
 # target to generate assembly for a file
-src/pages/page_main.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/page_main.c.s
-.PHONY : src/pages/page_main.c.s
+src/pages/emisor.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/emisor.c.s
+.PHONY : src/pages/emisor.c.s
 
-src/pages/page_one.obj: src/pages/page_one.c.obj
-.PHONY : src/pages/page_one.obj
+src/pages/inicializador.obj: src/pages/inicializador.c.obj
+.PHONY : src/pages/inicializador.obj
 
 # target to build an object file
-src/pages/page_one.c.obj:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/page_one.c.obj
-.PHONY : src/pages/page_one.c.obj
+src/pages/inicializador.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/inicializador.c.obj
+.PHONY : src/pages/inicializador.c.obj
 
-src/pages/page_one.i: src/pages/page_one.c.i
-.PHONY : src/pages/page_one.i
+src/pages/inicializador.i: src/pages/inicializador.c.i
+.PHONY : src/pages/inicializador.i
 
 # target to preprocess a source file
-src/pages/page_one.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/page_one.c.i
-.PHONY : src/pages/page_one.c.i
+src/pages/inicializador.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/inicializador.c.i
+.PHONY : src/pages/inicializador.c.i
 
-src/pages/page_one.s: src/pages/page_one.c.s
-.PHONY : src/pages/page_one.s
+src/pages/inicializador.s: src/pages/inicializador.c.s
+.PHONY : src/pages/inicializador.s
 
 # target to generate assembly for a file
-src/pages/page_one.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/page_one.c.s
-.PHONY : src/pages/page_one.c.s
+src/pages/inicializador.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/inicializador.c.s
+.PHONY : src/pages/inicializador.c.s
 
-src/pages/page_sender.obj: src/pages/page_sender.c.obj
-.PHONY : src/pages/page_sender.obj
+src/pages/modo_operacion.obj: src/pages/modo_operacion.c.obj
+.PHONY : src/pages/modo_operacion.obj
 
 # target to build an object file
-src/pages/page_sender.c.obj:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/page_sender.c.obj
-.PHONY : src/pages/page_sender.c.obj
+src/pages/modo_operacion.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/modo_operacion.c.obj
+.PHONY : src/pages/modo_operacion.c.obj
 
-src/pages/page_sender.i: src/pages/page_sender.c.i
-.PHONY : src/pages/page_sender.i
+src/pages/modo_operacion.i: src/pages/modo_operacion.c.i
+.PHONY : src/pages/modo_operacion.i
 
 # target to preprocess a source file
-src/pages/page_sender.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/page_sender.c.i
-.PHONY : src/pages/page_sender.c.i
+src/pages/modo_operacion.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/modo_operacion.c.i
+.PHONY : src/pages/modo_operacion.c.i
 
-src/pages/page_sender.s: src/pages/page_sender.c.s
-.PHONY : src/pages/page_sender.s
+src/pages/modo_operacion.s: src/pages/modo_operacion.c.s
+.PHONY : src/pages/modo_operacion.s
 
 # target to generate assembly for a file
-src/pages/page_sender.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/page_sender.c.s
-.PHONY : src/pages/page_sender.c.s
+src/pages/modo_operacion.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/modo_operacion.c.s
+.PHONY : src/pages/modo_operacion.c.s
+
+src/pages/nueva_instancia.obj: src/pages/nueva_instancia.c.obj
+.PHONY : src/pages/nueva_instancia.obj
+
+# target to build an object file
+src/pages/nueva_instancia.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/nueva_instancia.c.obj
+.PHONY : src/pages/nueva_instancia.c.obj
+
+src/pages/nueva_instancia.i: src/pages/nueva_instancia.c.i
+.PHONY : src/pages/nueva_instancia.i
+
+# target to preprocess a source file
+src/pages/nueva_instancia.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/nueva_instancia.c.i
+.PHONY : src/pages/nueva_instancia.c.i
+
+src/pages/nueva_instancia.s: src/pages/nueva_instancia.c.s
+.PHONY : src/pages/nueva_instancia.s
+
+# target to generate assembly for a file
+src/pages/nueva_instancia.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/nueva_instancia.c.s
+.PHONY : src/pages/nueva_instancia.c.s
 
 src/pages/page_two.obj: src/pages/page_two.c.obj
 .PHONY : src/pages/page_two.obj
@@ -295,30 +319,6 @@ src/pages/page_two.s: src/pages/page_two.c.s
 src/pages/page_two.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/page_two.c.s
 .PHONY : src/pages/page_two.c.s
-
-src/pages/sender_window.obj: src/pages/sender_window.c.obj
-.PHONY : src/pages/sender_window.obj
-
-# target to build an object file
-src/pages/sender_window.c.obj:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/sender_window.c.obj
-.PHONY : src/pages/sender_window.c.obj
-
-src/pages/sender_window.i: src/pages/sender_window.c.i
-.PHONY : src/pages/sender_window.i
-
-# target to preprocess a source file
-src/pages/sender_window.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/sender_window.c.i
-.PHONY : src/pages/sender_window.c.i
-
-src/pages/sender_window.s: src/pages/sender_window.c.s
-.PHONY : src/pages/sender_window.s
-
-# target to generate assembly for a file
-src/pages/sender_window.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\sdl_app.dir\build.make CMakeFiles/sdl_app.dir/src/pages/sender_window.c.s
-.PHONY : src/pages/sender_window.c.s
 
 src/processor.obj: src/processor.c.obj
 .PHONY : src/processor.obj
@@ -362,21 +362,21 @@ help:
 	@echo ... src/memory.obj
 	@echo ... src/memory.i
 	@echo ... src/memory.s
-	@echo ... src/pages/page_main.obj
-	@echo ... src/pages/page_main.i
-	@echo ... src/pages/page_main.s
-	@echo ... src/pages/page_one.obj
-	@echo ... src/pages/page_one.i
-	@echo ... src/pages/page_one.s
-	@echo ... src/pages/page_sender.obj
-	@echo ... src/pages/page_sender.i
-	@echo ... src/pages/page_sender.s
+	@echo ... src/pages/emisor.obj
+	@echo ... src/pages/emisor.i
+	@echo ... src/pages/emisor.s
+	@echo ... src/pages/inicializador.obj
+	@echo ... src/pages/inicializador.i
+	@echo ... src/pages/inicializador.s
+	@echo ... src/pages/modo_operacion.obj
+	@echo ... src/pages/modo_operacion.i
+	@echo ... src/pages/modo_operacion.s
+	@echo ... src/pages/nueva_instancia.obj
+	@echo ... src/pages/nueva_instancia.i
+	@echo ... src/pages/nueva_instancia.s
 	@echo ... src/pages/page_two.obj
 	@echo ... src/pages/page_two.i
 	@echo ... src/pages/page_two.s
-	@echo ... src/pages/sender_window.obj
-	@echo ... src/pages/sender_window.i
-	@echo ... src/pages/sender_window.s
 	@echo ... src/processor.obj
 	@echo ... src/processor.i
 	@echo ... src/processor.s
