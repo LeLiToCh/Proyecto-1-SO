@@ -5,3 +5,5 @@ CMakeCache.txt
 *.exe
 *.pdb
 *.user
+# Ignorar configuracion de Visual Studio Code
+.vscode/
