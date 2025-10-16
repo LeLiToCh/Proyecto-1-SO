@@ -3,10 +3,10 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-#include "pages/page_main.h"
-#include "pages/page_one.h"
+#include "pages/modo_operacion.h"
+#include "pages/inicializador.h"
 #include "pages/page_two.h"
-#include "pages/page_sender.h"
+#include "pages/nueva_instancia.h"
 #include "memory.h"
 
 #define WINDOW_W 800

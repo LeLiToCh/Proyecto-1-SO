@@ -213,8 +213,8 @@ CMakeFiles/sdl_app.dir/src/main.c.obj: \
  C:/msys64/mingw64/include/SDL2/SDL_ttf.h \
  C:/msys64/mingw64/include/SDL2/SDL.h \
  C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/stdbool.h \
- C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO\src\pages/page_main.h \
- C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO\src\pages/page_one.h \
+ C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO\src\pages/modo_operacion.h \
+ C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO\src\pages/inicializador.h \
  C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO\src\pages/page_two.h \
- C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO\src\pages/page_sender.h \
+ C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO\src\pages/nueva_instancia.h \
  C:\Users\EMMANU~1\Documents\GitHub\Proyecto-1-SO\src\memory.h

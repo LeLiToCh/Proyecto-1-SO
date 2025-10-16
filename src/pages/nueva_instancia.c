@@ -1,5 +1,5 @@
-#include "page_sender.h"
-#include "sender_window.h"
+#include "nueva_instancia.h"
+#include "emisor.h"
 #include "processor.h"
 #include "app_state.h"
 #include "memory.h"

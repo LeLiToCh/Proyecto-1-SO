@@ -1,7 +1,7 @@
 // Inicializador page: collects inputs and prints them when "Continuar" is clicked
 #include <stdbool.h>   // <-- debe ir PRIMERO de todo
-#include "page_one.h"
-#include "page_main.h" // para obtener modo seleccionado en pantalla principal
+#include "inicializador.h"
+#include "modo_operacion.h" // para obtener modo seleccionado en pantalla principal
 #include "memory.h"    // backend de memoria
 #include "processor.h" // procesado de archivo a memoria
 #include "app_state.h"
