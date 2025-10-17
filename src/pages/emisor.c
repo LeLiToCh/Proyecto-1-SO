@@ -1,3 +1,27 @@
+/* ============================================================================
+ * emisor.c — Ventana de envío (selector de archivo + procesamiento)
+ * ----------------------------------------------------------------------------
+ * Propósito:
+ *  - Mostrar una ventana simple con:
+ *      * cuadro para seleccionar archivo,
+ *      * botones: Buscar, Procesar, Nueva Instancia, Cerrar.
+ *  - Inicializar/adjuntar memoria compartida y lanzar receptor/procesador
+ *    en modo asíncrono según parámetros.
+ *
+ * Puntos clave:
+ *  - El botón "Procesar" valida que exista archivo y clave de 8 bits,
+ *    inicializa memoria compartida (nombre = identificador) y arranca
+ *    receptor + processor.
+ *  - "Nueva Instancia" abre otra ventana de emisor independiente.
+ *  - Antes de cerrar (QUIT o "Cerrar"), invoca finalizador_shutdown_system.
+ *
+ * Notas:
+ *  - En Windows se usa el diálogo nativo de selección de archivo; en *nix
+ *    se invoca "zenity" si está disponible (vía popen).
+ *  - La fuente "font.ttf" se intenta abrir a 20 pt; si falla, se sigue
+ *    renderizando sin texto (se registra el aviso).
+ * ========================================================================== */
+
 #include "emisor.h"
 #include <SDL.h>
 #include <SDL_ttf.h>
@@ -13,18 +37,30 @@
 #include <commdlg.h>
 #endif
 
-// Simple sender window: shows file browser and process button
+// Ventana simple del emisor: muestra explorador de archivos y botón de proceso
 #include <stdio.h>
-#define MAX_PATH_LEN 512
+#define MAX_PATH_LEN 512  /* Longitud máxima de ruta manejada por la UI */
 
-static int g_instance_counter = 0;
+static int g_instance_counter = 0; /* Contador de instancias abiertas */
 
+/**
+ * @brief Abre una ventana del emisor y procesa eventos/render hasta cerrar.
+ * @param identificador Nombre lógico para la memoria compartida (si NULL, "mem").
+ * @param cantidad      Capacidad del buffer compartido (si 0, se fuerza a 1).
+ * @param clave         Cadena de 8 bits (p. ej., "01010101"); si NULL/longitud !=8,
+ *                      se usa app_state_get_clave().
+ * @param automatic     Modo de procesamiento automático/manual (se propaga).
+ * @note Lanza receptor_start_async y processor_start_async cuando se presiona
+ *       "Procesar" con parámetros válidos.
+ * @sideeffects Crea/dibuja ventana y renderer SDL; puede crear nuevas instancias.
+ */
 void sender_window_start_async(const char *identificador, int cantidad, const char *clave, bool automatic) {
     SDL_Window *win = SDL_CreateWindow("Emisor", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 600, 300, SDL_WINDOW_SHOWN);
     SDL_Renderer *ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     TTF_Font *font = TTF_OpenFont("font.ttf", 20);
     if (!font) { printf("No se pudo cargar la fuente\n"); }
 
+    /* Estado local por ventana: ruta del archivo a procesar */
     // Estado local por ventana (no compartido entre instancias)
     char file_path[MAX_PATH_LEN]; file_path[0] = '\0';
     // El ID de 8 bits viene del inicializador (app_state)
@@ -40,19 +76,23 @@ void sender_window_start_async(const char *identificador, int cantidad, const ch
         SDL_Event e;
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT) {
+                /* Cierre por evento de sistema: asegurar apagado coordinado */
                 // Invocar finalizador antes de cerrar la ventana
                 finalizador_shutdown_system(app_state_get_cantidad());
                 running = 0;
             } else if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT) {
                 int mx = e.button.x, my = e.button.y;
                 if (mx >= close_btn.x && mx <= close_btn.x + close_btn.w && my >= close_btn.y && my <= close_btn.y + close_btn.h) {
+                    /* Botón "Cerrar": apaga y sale del bucle */
                     // Invocar finalizador antes de cerrar la ventana
                     finalizador_shutdown_system(app_state_get_cantidad());
                     running = 0;
                 } else if (mx >= newinst_btn.x && mx <= newinst_btn.x + newinst_btn.w && my >= newinst_btn.y && my <= newinst_btn.y + newinst_btn.h) {
+                    /* Botón "Nueva Instancia": abre otra ventana Emisor */
                     (void)++g_instance_counter;
                     sender_window_start_async(identificador, cantidad, NULL, automatic);
                 } else if (mx >= search_btn.x && mx <= search_btn.x + search_btn.w && my >= search_btn.y && my <= search_btn.y + search_btn.h) {
+                    /* Botón "Buscar": abre diálogo nativo (Win) o zenity (*nix) */
                     // Abrir diálogo nativo
                     #ifdef _WIN32
                     WCHAR wbuf[MAX_PATH_LEN] = {0};
@@ -82,6 +122,7 @@ void sender_window_start_async(const char *identificador, int cantidad, const ch
                     }
                     #endif
                 } else if (mx >= process_btn.x && mx <= process_btn.x + process_btn.w && my >= process_btn.y && my <= process_btn.y + process_btn.h) {
+                    /* Botón "Procesar": valida parámetros e inicializa pipeline */
                     const char *key_to_use = (clave && strlen(clave) == 8) ? clave : app_state_get_clave();
                     if (key_to_use && strlen(key_to_use) == 8 && file_path[0]) {
                         bool created = false;
@@ -90,6 +131,7 @@ void sender_window_start_async(const char *identificador, int cantidad, const ch
                         bool ok = memory_init_shared(ident, cantidad, &created);
                         printf("[window] Memoria compartida %s (capacidad=%zu): %s\n", created ? "creada" : "adjunta", memory_capacity(), ok ? "OK" : "ERROR");
                         if (ok) {
+                            /* Inicia receptor y procesador en paralelo (asíncronos) */
                             receptor_start_async(key_to_use, automatic);
                             processor_start_async(file_path, key_to_use, automatic);
                         } else {
@@ -100,12 +142,13 @@ void sender_window_start_async(const char *identificador, int cantidad, const ch
             }
         }
 
-        // Render
+        /* ===================== RENDER UI (cada frame) ===================== */
+        // Fondo
         SDL_SetRenderDrawColor(ren, 245,245,245,255);
         SDL_RenderClear(ren);
 
-        // Botón nueva instancia
-        SDL_SetRenderDrawColor(ren, 255, 140, 0, 255); // naranja
+        // Botón “Nueva Instancia” (naranja)
+        SDL_SetRenderDrawColor(ren, 255, 140, 0, 255);
         SDL_RenderFillRect(ren, &newinst_btn);
         if (font) {
             SDL_Surface *sni = TTF_RenderUTF8_Blended(font, "Nueva Instancia", (SDL_Color){255,255,255,255});
@@ -116,8 +159,8 @@ void sender_window_start_async(const char *identificador, int cantidad, const ch
             SDL_DestroyTexture(tni); SDL_FreeSurface(sni);
         }
 
-        // Botón cerrar
-        SDL_SetRenderDrawColor(ren, 220, 20, 60, 255); // rojo
+        // Botón “Cerrar” (rojo)
+        SDL_SetRenderDrawColor(ren, 220, 20, 60, 255);
         SDL_RenderFillRect(ren, &close_btn);
         if (font) {
             SDL_Surface *lab = TTF_RenderUTF8_Blended(font, "Cerrar", (SDL_Color){255,255,255,255});
@@ -128,7 +171,7 @@ void sender_window_start_async(const char *identificador, int cantidad, const ch
             SDL_DestroyTexture(tlab); SDL_FreeSurface(lab);
         }
 
-        // File path label y caja
+        // Etiqueta y caja de ruta de archivo
         if (font) {
             SDL_Surface *lab = TTF_RenderUTF8_Blended(font, "Selecciona tu archivo para procesar", (SDL_Color){0,0,0,255});
             SDL_Texture *tlab = SDL_CreateTextureFromSurface(ren, lab);
@@ -150,7 +193,7 @@ void sender_window_start_async(const char *identificador, int cantidad, const ch
             SDL_DestroyTexture(ttxt); SDL_FreeSurface(txt);
         }
 
-        // Botón Buscar
+        // Botón “Buscar” (azul)
         SDL_SetRenderDrawColor(ren, 100,149,237,255);
         SDL_RenderFillRect(ren, &search_btn);
         if (font) {
@@ -162,7 +205,7 @@ void sender_window_start_async(const char *identificador, int cantidad, const ch
             SDL_DestroyTexture(tsbtn); SDL_FreeSurface(sbtn);
         }
 
-        // Botón Procesar
+        // Botón “Procesar” (verde)
         SDL_SetRenderDrawColor(ren, 34,139,34,255);
         SDL_RenderFillRect(ren, &process_btn);
         if (font) {

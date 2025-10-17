@@ -1,3 +1,24 @@
+/* ============================================================================
+ * nueva_instancia.c — Pantalla "sender": selección de archivo y arranque
+ * ----------------------------------------------------------------------------
+ * Propósito:
+ *  - Permitir elegir el archivo a procesar y arrancar el pipeline
+ *    (receptor + processor) usando el estado global configurado previamente.
+ *  - Crear nuevas ventanas "sender" que compartan el mismo identificador
+ *    de memoria (múltiples productores hacia un mismo buffer acotado).
+ *
+ * Puntos clave:
+ *  - Botón "Volver": invoca finalizador y regresa a PAGE_ONE.
+ *  - Botón "Nueva Instancia": abre otra ventana del emisor con mismo ID.
+ *  - Botón "Buscar": diálogo nativo/zenity para elegir archivo.
+ *  - Botón "Iniciar": valida clave (8 bits) y memoria, lanza receptor+processor.
+ *
+ * Notas:
+ *  - La variable estática 'file_path' contiene la última selección del usuario.
+ *  - Este módulo utiliza app_state_* para obtener identificador, cantidad,
+ *    clave y modo automático/manual.
+ * ========================================================================== */
+
 #include "nueva_instancia.h"
 #include "emisor.h"
 #include "processor.h"
@@ -14,11 +35,17 @@
 #include <commdlg.h>
 #endif
 
+/* Ruta del archivo seleccionada para esta vista */
 static char file_path[512] = "";
-// instance counter for spawned windows
+/* Contador de instancias creadas (ventanas adicionales) */
 static int g_instance_counter = 0;
 
-// helper: open native file dialog into out buffer (UTF-8). Returns 1 on success.
+/**
+ * @brief Abre un diálogo de archivo nativo; devuelve la ruta en UTF-8.
+ * @param out    Buffer de salida.
+ * @param outlen Tamaño del buffer de salida.
+ * @return 1 si se seleccionó archivo; 0 en caso contrario.
+ */
 static int open_file_dialog_local(char *out, size_t outlen) {
 #ifdef _WIN32
     WCHAR wbuf[MAX_PATH] = {0};
@@ -53,42 +80,47 @@ static int open_file_dialog_local(char *out, size_t outlen) {
 #endif
 }
 
+/**
+ * @brief Maneja eventos de la pantalla "sender" (archivo + iniciar + nueva instancia).
+ * @param e             Evento SDL.
+ * @param out_next_page Siguiente página a la que navegar (si aplica).
+ */
 void page_sender_handle_event(SDL_Event *e, int *out_next_page) {
     if (e->type == SDL_MOUSEBUTTONDOWN && e->button.button == SDL_BUTTON_LEFT) {
         int mx = e->button.x, my = e->button.y;
-    SDL_Rect back = {20,20,100,40};
-    SDL_Rect fpbox = {120,490,480,30};
-    SDL_Rect search_btn = { fpbox.x + fpbox.w + 8, fpbox.y, 80, fpbox.h };
-    SDL_Rect iniciar_btn = {200, 180, 160, 50};
-    SDL_Rect newinst_btn = { back.x + back.w + 10, back.y, 180, back.h };
+        SDL_Rect back = {20,20,100,40};
+        SDL_Rect fpbox = {120,490,480,30};
+        SDL_Rect search_btn = { fpbox.x + fpbox.w + 8, fpbox.y, 80, fpbox.h };
+        SDL_Rect iniciar_btn = {200, 180, 160, 50};
+        SDL_Rect newinst_btn = { back.x + back.w + 10, back.y, 180, back.h };
 
         if (mx >= back.x && mx <= back.x + back.w && my >= back.y && my <= back.y + back.h) {
             // Invocar finalizador antes de cerrar la ventana
             finalizador_shutdown_system(app_state_get_cantidad());
-            // go back to inicializador
+            // Volver al inicializador
             *out_next_page = 1; // PAGE_ONE
             return;
         }
 
         if (mx >= newinst_btn.x && mx <= newinst_btn.x + newinst_btn.w && my >= newinst_btn.y && my <= newinst_btn.y + newinst_btn.h) {
-            // create a new sender window that shares the SAME memory identifier
-            // so all producers write to one bounded circular buffer (no overwrite when full)
+            /* Crear nueva ventana de emisor que comparta el MISMO identificador
+               para que todos los productores escriban en un buffer acotado común */
             const char *base_ident = app_state_get_identificador();
             size_t cantidad = app_state_get_cantidad();
             bool automatic = app_state_get_automatic();
             const char *shared_ident = (base_ident && base_ident[0]) ? base_ident : "mem";
-            // Spawn window (non-blocking) with clean UI (NULL clave)
+            // Lanzar ventana (no bloquea) con UI limpia (NULL clave)
             sender_window_start_async(shared_ident, (int)cantidad, NULL, automatic);
             return;
         }
 
         if (mx >= search_btn.x && mx <= search_btn.x + search_btn.w && my >= search_btn.y && my <= search_btn.y + search_btn.h) {
-            // open native file dialog
+            /* Abrir diálogo nativo de archivo */
             if (open_file_dialog_local(file_path, sizeof(file_path))) {
-                // selected
+                // seleccionado: file_path queda actualizado
             }
         } else if (mx >= iniciar_btn.x && mx <= iniciar_btn.x + iniciar_btn.w && my >= iniciar_btn.y && my <= iniciar_btn.y + iniciar_btn.h) {
-            // Iniciar: initialize memory then start processing
+            /* Iniciar: validar parámetros e inicializar pipeline */
             const char *ident = app_state_get_identificador();
             size_t cantidad = app_state_get_cantidad();
             const char *clave = app_state_get_clave();
@@ -111,12 +143,19 @@ void page_sender_handle_event(SDL_Event *e, int *out_next_page) {
     }
 }
 
+/**
+ * @brief Renderiza la pantalla "sender": volver, nueva instancia, selector de archivo e iniciar.
+ * @param ren  Renderer de SDL.
+ * @param font Fuente TTF.
+ */
 void page_sender_render(SDL_Renderer *ren, TTF_Font *font) {
     SDL_SetRenderDrawColor(ren, 245,245,245,255);
     SDL_RenderClear(ren);
-    // render back button y nueva instancia
+
+    /* Botón Volver y Nueva Instancia (barra superior) */
     SDL_Rect back = {20,20,100,40};
     SDL_Rect newinst_btn = { back.x + back.w + 10, back.y, 180, back.h };
+
     // Volver
     SDL_SetRenderDrawColor(ren, 70,130,180,255);
     SDL_RenderFillRect(ren, &back);
@@ -128,6 +167,7 @@ void page_sender_render(SDL_Renderer *ren, TTF_Font *font) {
         SDL_RenderCopy(ren, tv, NULL, &dv);
         SDL_DestroyTexture(tv); SDL_FreeSurface(sv);
     }
+
     // Nueva instancia
     SDL_SetRenderDrawColor(ren, 255,140,0,255); // naranja
     SDL_RenderFillRect(ren, &newinst_btn);
@@ -140,7 +180,7 @@ void page_sender_render(SDL_Renderer *ren, TTF_Font *font) {
         SDL_DestroyTexture(tni); SDL_FreeSurface(sni);
     }
 
-    // file selector label and box (moved from page_one)
+    /* Selector de archivo (migrado desde page_one) */
     SDL_Rect fp_label = {120,460,300,20};
     SDL_Rect fpbox = {120,490,480,30};
     SDL_Rect search_btn = { fpbox.x + fpbox.w + 8, fpbox.y, 80, fpbox.h };
@@ -157,7 +197,8 @@ void page_sender_render(SDL_Renderer *ren, TTF_Font *font) {
     SDL_RenderFillRect(ren, &fpbox);
     SDL_SetRenderDrawColor(ren, 200,200,200,255);
     SDL_RenderDrawRect(ren, &fpbox);
-    // search button
+
+    // Botón Buscar
     SDL_SetRenderDrawColor(ren, 100,149,237,255);
     SDL_RenderFillRect(ren, &search_btn);
     if (font) {
@@ -168,7 +209,8 @@ void page_sender_render(SDL_Renderer *ren, TTF_Font *font) {
         SDL_RenderCopy(ren, tsbtn, NULL, &ds);
         SDL_DestroyTexture(tsbtn); SDL_FreeSurface(sbtn);
     }
-    // show selected file inside box
+
+    // Mostrar la ruta seleccionada dentro de la caja
     if (file_path[0] && font) {
         SDL_Color col = {0,0,0,255};
         SDL_Surface *fp = TTF_RenderUTF8_Blended(font, file_path, col);
@@ -179,7 +221,7 @@ void page_sender_render(SDL_Renderer *ren, TTF_Font *font) {
         SDL_DestroyTexture(tfp); SDL_FreeSurface(fp);
     }
 
-    // iniciar button (single Volver is the top back button)
+    // Botón "Iniciar" (lanza pipeline)
     SDL_Rect iniciar_btn = {200, 180, 160, 50};
     SDL_SetRenderDrawColor(ren, 34,139,34,255);
     SDL_RenderFillRect(ren, &iniciar_btn);

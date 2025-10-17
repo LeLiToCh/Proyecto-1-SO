@@ -1,3 +1,24 @@
+/* ============================================================================
+ * processor.c — Lector/encoder de archivo hacia memoria compartida
+ * ----------------------------------------------------------------------------
+ * Propósito:
+ *  - Leer un archivo en binario/UTF-8, aplicar XOR de 8 bits por carácter
+ *    usando una clave derivada de texto binario, y escribirlo en la memoria
+ *    (local o compartida) respetando la sincronización de semáforos.
+ *
+ * Puntos clave:
+ *  - key_from_bits(): toma los 8 bits menos significativos (derecha a izquierda).
+ *  - process_file_into_memory(): imprime cabecera y tabla por carácter; en
+ *    modo manual, espera Enter entre caracteres.
+ *  - processor_start_async(): lanza el procesamiento en un hilo SDL.
+ *  - Uso del monitor: registra inicio/fin con monitor_processor_*().
+ *
+ * Notas:
+ *  - En Windows se usa _wfopen para soportar rutas UTF-16 con acentos.
+ *  - Se formatea fecha-hora local con memory_format_timestamp().
+ *  - Las escrituras bloquean si el buffer está lleno (semaforización en memory.c).
+ * ========================================================================== */
+
 #include "processor.h"
 #include "memory.h"
 #include "monitor.h"
@@ -9,9 +30,14 @@
 #endif
 #include <SDL.h>
 
+/**
+ * @brief Convierte una cadena '0'/'1' en una clave de 8 bits.
+ * @param bits Cadena binaria; si >8, toma los 8 menos significativos (a la derecha).
+ * @return Clave XOR de 8 bits (uint8_t). Si NULL o vacía, devuelve 0.
+ */
 static uint8_t key_from_bits(const char *bits) {
     if (!bits || !*bits) return 0;
-    // Take last 8 significant bits from right to left
+    // Tomar los últimos 8 bits significativos de derecha a izquierda
     size_t n = strlen(bits);
     uint8_t k = 0;
     int cnt = 0;
@@ -21,6 +47,19 @@ static uint8_t key_from_bits(const char *bits) {
     return k;
 }
 
+/**
+ * @brief Procesa un archivo y escribe sus bytes codificados en memoria.
+ * @param filepath Ruta del archivo (UTF-8).
+ * @param key_bits Cadena binaria para derivar clave XOR de 8 bits.
+ * @param automatic true=flujo continuo; false=espera Enter entre caracteres.
+ * @return true en éxito; false ante error (p. ej., al abrir archivo o escribir).
+ *
+ * Flujo:
+ *  - Abre el archivo en modo binario.
+ *  - Deriva la clave de 8 bits a partir de key_bits.
+ *  - Para cada byte: orig ^ key -> enc; escribe enc en memoria con metadatos.
+ *  - Imprime tabla de progreso (idx, hora, in, enc, key, ocupación del buffer).
+ */
 bool process_file_into_memory(const char *filepath, const char *key_bits, bool automatic) {
     if (!filepath || !*filepath) { fprintf(stderr, "[processor] filepath vacio\n"); return false; }
     // Imprimir todos los datos relevantes
@@ -38,7 +77,7 @@ bool process_file_into_memory(const char *filepath, const char *key_bits, bool a
     printf(" Semilla bits  : %s\n", key_bits);
     FILE *f = NULL;
 #ifdef _WIN32
-    // Convert UTF-8 path to UTF-16 and use _wfopen to handle accents
+    // Convertir ruta UTF-8 a UTF-16 y usar _wfopen para soportar acentos
     int wlen = MultiByteToWideChar(CP_UTF8, 0, filepath, -1, NULL, 0);
     if (wlen > 0) {
         wchar_t *wpath = (wchar_t*)malloc(wlen * sizeof(wchar_t));
@@ -63,27 +102,27 @@ bool process_file_into_memory(const char *filepath, const char *key_bits, bool a
     int c;
     size_t line_no = 0;
     while ((c = fgetc(f)) != EOF) {
-        // Only process printable and common whitespace; others can be skipped or stored as-is
+        // Procesar byte original -> XOR -> encolar en memoria
         uint8_t orig = (uint8_t)c;
         uint8_t enc = orig ^ key;
         uint32_t idx = 0; uint64_t ts = 0;
-        // Write into memory (blocks if full due to semaphores)
+        // Escribir en memoria (bloquea si lleno por semáforos)
         if (!memory_write_entry_with_key(enc, key, &idx, &ts)) {
             fprintf(stderr, "[processor] fallo al escribir en memoria\n");
             fclose(f);
             return false;
         }
-        // Pretty print row under header with formatted local time
+        // Fila con hora local formateada
         char when[32];
         memory_format_timestamp(ts, when, sizeof(when));
-     size_t cap = memory_capacity();
-     size_t sz  = memory_size();
-     ++line_no;
-     printf(" %3zu | %-23s | %3u | %3u | 0x%02X | 0x%02X | %2zu/%-2zu\n",
-         line_no, when, (unsigned)idx, (unsigned)orig, enc, (unsigned)key, sz, cap);
+        size_t cap = memory_capacity();
+        size_t sz  = memory_size();
+        ++line_no;
+        printf(" %3zu | %-23s | %3u | %3u | 0x%02X | 0x%02X | %2zu/%-2zu\n",
+               line_no, when, (unsigned)idx, (unsigned)orig, enc, (unsigned)key, sz, cap);
         fflush(stdout);
         if (!automatic) {
-            // Wait for Enter to proceder a next character
+            // Esperar Enter para continuar con el siguiente carácter
             printf("[manual] Presione Enter para continuar...\n");
             int ch;
             while ((ch = getchar()) != '\n' && ch != EOF) {}
@@ -93,12 +132,19 @@ bool process_file_into_memory(const char *filepath, const char *key_bits, bool a
     return true;
 }
 
+/* --------------------------- Hilo de procesamiento ------------------------ */
+/* Estructura de argumentos para el hilo SDL del procesador */
 typedef struct {
     char path[1024];
     char key[16];
     int automatic; // 0/1
 } ProcArgs;
 
+/**
+ * @brief Función del hilo: ejecuta el procesamiento y notifica monitor.
+ * @param data Puntero a ProcArgs (propiedad transferida; se libera aquí).
+ * @return 0 al finalizar.
+ */
 static int processor_thread(void *data) {
     ProcArgs *a = (ProcArgs*)data;
     process_file_into_memory(a->path, a->key, a->automatic ? true : false);
@@ -110,6 +156,14 @@ static int processor_thread(void *data) {
     return 0;
 }
 
+/**
+ * @brief Inicia el procesamiento en un hilo SDL.
+ * @param filepath Ruta del archivo origen (UTF-8).
+ * @param key_bits Cadena binaria para derivar clave XOR de 8 bits.
+ * @param automatic true=Automático, false=Manual.
+ * @return true si el hilo se creó correctamente; false en caso contrario.
+ * @note El hilo se desacopla con SDL_DetachThread; no es joinable.
+ */
 bool processor_start_async(const char *filepath, const char *key_bits, bool automatic) {
     if (!filepath || !*filepath) return false;
     ProcArgs *a = (ProcArgs*)malloc(sizeof(ProcArgs));

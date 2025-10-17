@@ -1,3 +1,30 @@
+/* ============================================================================
+ * memory.c — Buffer circular en memoria (local y compartida) con semáforos
+ * ----------------------------------------------------------------------------
+ * Propósito:
+ *  - Proveer un ring buffer de entradas MemEntry con dos modos:
+ *      1) Local (heap del proceso).
+ *      2) Compartido entre procesos (Windows: FileMapping + semáforos Win32 /
+ *         POSIX: shm_open + mmap + semáforos POSIX).
+ *  - Sincronizar productores/consumidores mediante semáforos:
+ *      * control (exclusión mutua binaria),
+ *      * items (contador de elementos),
+ *      * spaces (contador de espacios libres),
+ *      * full (bandera binaria cuando el buffer se llena por completo),
+ *      * term (difusión de terminación).
+ *
+ * Invariantes:
+ *  - 0 <= size <= cap; head apunta al más antiguo; tail al siguiente libre.
+ *  - En modo compartido, toda actualización de índices/size se hace bajo
+ *    el semáforo de control para mantener coherencia.
+ *
+ * Notas:
+ *  - La API expone operaciones de escritura/lectura bloqueantes para items/spaces.
+ *  - Las funciones *_shared crean/adjuntan los objetos de IPC y marcan g_is_shared.
+ *  - La marca 'full' es binaria: se activa al transicionar a “lleno” y se drena
+ *    al leer cuando estaba lleno.
+ * ========================================================================== */
+
 #include "memory.h"
 #include <stdlib.h>
 #include <string.h>
@@ -9,18 +36,24 @@
 #include <wchar.h>
 #endif
 
+/* --------------------- Estructuras internas (modo local) ------------------ */
+/* Ring buffer local: índices mod cap */
 typedef struct {
     MemEntry *buf;
-    size_t cap;   // capacity
-    size_t head;  // index of oldest element
-    size_t tail;  // index one past newest element
-    size_t size;  // number of elements
+    size_t cap;   // capacidad
+    size_t head;  // índice del elemento más antiguo
+    size_t tail;  // índice del siguiente libre
+    size_t size;  // número de elementos
 } MemRB;
 
+/* Instancia global para modo local */
 static MemRB g_mem = {0};
+/* Flag global: 0 = local, 1 = compartido (usar structs/IPC específicos) */
 static int g_is_shared = 0;
 
+/* ---------------------- Estructuras/handles (Windows) --------------------- */
 #ifdef _WIN32
+/* Cabecera común en shm: índices y capacidad */
 typedef struct {
     size_t cap;
     size_t head;
@@ -28,17 +61,26 @@ typedef struct {
     size_t size;
 } SharedHeader;
 
+/* Objetos de kernel para memoria y sincronización (Win32) */
 static HANDLE g_hMap = NULL;
-static HANDLE g_hControl = NULL; // binary semaphore used as control (replaces mutex)
+static HANDLE g_hControl = NULL; // semáforo binario usado como control (reemplaza mutex)
 static HANDLE g_hItems = NULL;
 static HANDLE g_hSpaces = NULL;
-static HANDLE g_hFull = NULL;    // signaled when buffer becomes full (binary)
-static HANDLE g_hTerm = NULL;    // termination broadcast semaphore
+static HANDLE g_hFull = NULL;    // señalizado cuando el buffer se llena (binario)
+static HANDLE g_hTerm = NULL;    // semáforo de difusión de terminación
 static SharedHeader *g_sh = NULL;
 static MemEntry *g_sh_data = NULL;
 
+/**
+ * @brief Convierte un nombre UTF-8 a wide y sanea caracteres para objetos de kernel.
+ * @param utf8   Nombre base (puede ser NULL).
+ * @param out    Buffer wide de salida.
+ * @param outc   Capacidad del buffer wide.
+ * @param suffix Sufijo wide a concatenar (p. ej., L"_mem").
+ * @note Reemplaza '\\', '/', ':' por '_' para evitar problemas de espacio de nombres.
+ */
 static void to_wide_sanitized(const char *utf8, wchar_t *out, size_t outc, const wchar_t *suffix) {
-    // Convert utf8 to wide; replace backslashes with underscores to avoid object namespace issues
+    // Convertir a wide y sanear: evitar separadores problemáticos en nombres de objeto
     int needed = MultiByteToWideChar(CP_UTF8, 0, utf8 ? utf8 : "", -1, NULL, 0);
     wchar_t tmp[512];
     if (needed <= 0 || needed >= (int)(sizeof(tmp)/sizeof(tmp[0]))) {
@@ -54,6 +96,7 @@ static void to_wide_sanitized(const char *utf8, wchar_t *out, size_t outc, const
     out[outc-1] = L'\0';
 }
 #else
+/* --------------------------- POSIX (Linux/macOS) -------------------------- */
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <semaphore.h>
@@ -64,20 +107,28 @@ typedef struct {
     size_t tail;
     size_t size;
 } SharedHeader;
+/* Descriptores y nombres de objetos POSIX */
 static int g_sh_fd = -1;
 static SharedHeader *g_sh = NULL;
 static MemEntry *g_sh_data = NULL;
-static sem_t *g_sem_ctrl = NULL;  // control semaphore (binary)
-static sem_t *g_sem_items = NULL;
-static sem_t *g_sem_spaces = NULL;
-static sem_t *g_sem_full = NULL;  // becomes >0 when buffer is full
-static sem_t *g_sem_term = NULL;  // termination broadcast
+static sem_t *g_sem_ctrl = NULL;  // semáforo de control (binario)
+static sem_t *g_sem_items = NULL; // contador de elementos disponibles
+static sem_t *g_sem_spaces = NULL;// contador de espacios libres
+static sem_t *g_sem_full = NULL;  // >0 cuando el buffer está lleno
+static sem_t *g_sem_term = NULL;  // difusión de terminación
 static char g_name_mem[128];
 static char g_name_ctrl[128];
 static char g_name_items[128];
 static char g_name_spaces[128];
 static char g_name_full[128];
 static char g_name_term[128];
+
+/**
+ * @brief Sanea un nombre para recursos POSIX, reemplazando separadores.
+ * @param in   Nombre de entrada.
+ * @param out  Buffer de salida.
+ * @param outc Capacidad de salida.
+ */
 static void sanitize_name(const char *in, char *out, size_t outc) {
     size_t i=0; for (; in && in[i] && i+1<outc; ++i) {
         char c = in[i];
@@ -88,10 +139,16 @@ static void sanitize_name(const char *in, char *out, size_t outc) {
 }
 #endif
 
+/**
+ * @brief Inicializa el buffer de memoria en modo local (no compartido).
+ * @param capacity Capacidad deseada (mínimo 1).
+ * @return true si el buffer quedó listo; false ante fallo de reserva.
+ * @note Si ya existía un buffer local, se libera y se crea uno nuevo.
+ */
 bool memory_init(size_t capacity) {
     g_is_shared = 0;
-    if (capacity == 0) capacity = 1; // enforce minimum
-    // re-init: free previous buffer
+    if (capacity == 0) capacity = 1; // forzar mínimo
+    // reinicialización: liberar buffer previo
     if (g_mem.buf) {
         free(g_mem.buf);
         g_mem = (MemRB){0};
@@ -106,6 +163,10 @@ bool memory_init(size_t capacity) {
     return true;
 }
 
+/**
+ * @brief Libera todos los recursos (locales o compartidos) y reinicia estado global.
+ * @post Después de llamar, g_is_shared=0 y no hay memoria asignada.
+ */
 void memory_shutdown(void) {
     if (g_is_shared) {
 #ifdef _WIN32
@@ -117,7 +178,7 @@ void memory_shutdown(void) {
         if (g_hTerm) { CloseHandle(g_hTerm); g_hTerm = NULL; }
         if (g_hMap) { CloseHandle(g_hMap); g_hMap = NULL; }
 #else
-    if (g_sh) { munmap(g_sh, sizeof(SharedHeader) + (g_sh->cap * sizeof(MemEntry))); g_sh = NULL; g_sh_data = NULL; }
+        if (g_sh) { munmap(g_sh, sizeof(SharedHeader) + (g_sh->cap * sizeof(MemEntry))); g_sh = NULL; g_sh_data = NULL; }
         if (g_sh_fd >= 0) { close(g_sh_fd); g_sh_fd = -1; }
         if (g_sem_items) { sem_close(g_sem_items); g_sem_items = NULL; }
         if (g_sem_spaces) { sem_close(g_sem_spaces); g_sem_spaces = NULL; }
@@ -130,43 +191,47 @@ void memory_shutdown(void) {
     if (g_mem.buf) { free(g_mem.buf); g_mem = (MemRB){0}; }
 }
 
+/**
+ * @brief Limpia el contenido del buffer (resetea índices y contadores).
+ * @note En modo compartido, también reestablece los contadores de semáforo
+ *       para reflejar “buffer vacío”.
+ */
 void memory_clear(void) {
     if (g_is_shared) {
 #ifdef _WIN32
-    // Reset indices under control semaphore
+    // Resetear índices bajo el semáforo de control
     WaitForSingleObject(g_hControl, INFINITE);
         size_t cap = g_sh->cap;
         g_sh->head = g_sh->tail = 0;
         g_sh->size = 0;
     ReleaseSemaphore(g_hControl, 1, NULL);
-        // Drain items to 0
+        // Vaciar 'items' hasta 0
         while (WaitForSingleObject(g_hItems, 0) == WAIT_OBJECT_0) {}
-        // Drain spaces to 0, then set to cap
+        // Vaciar 'spaces' hasta 0, luego llevarlo a 'cap'
         int drained = 0;
         while (WaitForSingleObject(g_hSpaces, 0) == WAIT_OBJECT_0) { drained++; }
         if (drained < (int)cap) {
             ReleaseSemaphore(g_hSpaces, (LONG)cap, NULL);
         } else {
-            // If drained >= cap, just set back to cap
+            // Si drained >= cap, igualmente reestablecer a 'cap'
             ReleaseSemaphore(g_hSpaces, (LONG)cap, NULL);
         }
-    // Drain full to 0
+    // Vaciar 'full' hasta 0
     while (WaitForSingleObject(g_hFull, 0) == WAIT_OBJECT_0) {}
 #else
-    // POSIX: lock control semaphore
+    // POSIX: tomar semáforo de control
     sem_wait(g_sem_ctrl);
         size_t cap = g_sh->cap;
         g_sh->head = g_sh->tail = 0;
         g_sh->size = 0;
     sem_post(g_sem_ctrl);
-        // Drain items
-        int v = 0;
+        // Vaciar 'items'
         while (sem_trywait(g_sem_items) == 0) {}
-        // Drain spaces then set to cap
+        // Vaciar 'spaces' y luego publicar 'cap' veces
         int drained_spaces = 0;
         while (sem_trywait(g_sem_spaces) == 0) { drained_spaces++; }
         for (size_t i=0; i<cap; ++i) sem_post(g_sem_spaces);
-    // Drain full
+    // Vaciar 'full'
     while (sem_trywait(g_sem_full) == 0) {}
 #endif
     } else {
@@ -175,7 +240,13 @@ void memory_clear(void) {
     }
 }
 
+/** @brief Devuelve la capacidad del buffer actual. */
 size_t memory_capacity(void) { return g_is_shared ? (g_sh ? g_sh->cap : 0) : g_mem.cap; }
+
+/**
+ * @brief Devuelve el número de elementos actualmente almacenados.
+ * @note En modo compartido se lee bajo el semáforo de control para consistencia.
+ */
 size_t memory_size(void) {
     if (!g_is_shared) return g_mem.size;
 #ifdef _WIN32
@@ -192,14 +263,21 @@ size_t memory_size(void) {
     return sz;
 #endif
 }
+
+/** @brief Indica si el buffer está vacío. */
 bool memory_is_empty(void) { return memory_size() == 0; }
+/** @brief Indica si el buffer está lleno. */
 bool memory_is_full(void) { return memory_size() == memory_capacity(); }
 
+/**
+ * @brief Obtiene timestamp actual en ms desde epoch (UTC).
+ * @return Milisegundos desde 1970-01-01 00:00:00 UTC.
+ */
 static uint64_t now_ms(void) {
 #ifdef _WIN32
     FILETIME ft; GetSystemTimeAsFileTime(&ft);
     ULARGE_INTEGER uli; uli.LowPart = ft.dwLowDateTime; uli.HighPart = ft.dwHighDateTime;
-    const uint64_t EPOCH_DIFF = 116444736000000000ULL; // 1601->1970 in 100ns
+    const uint64_t EPOCH_DIFF = 116444736000000000ULL; // 1601->1970 en pasos de 100ns
     uint64_t t100ns = uli.QuadPart - EPOCH_DIFF;
     return t100ns / 10000ULL;
 #else
@@ -208,16 +286,21 @@ static uint64_t now_ms(void) {
 #endif
 }
 
-// Convert ms since Unix epoch to local time string "YYYY-MM-DD HH:MM:SS".
+/**
+ * @brief Formatea un timestamp (ms) a cadena local "YYYY-MM-DD HH:MM:SS".
+ * @param ts_ms Timestamp en milisegundos.
+ * @param out   Buffer de salida.
+ * @param outsz Capacidad del buffer de salida.
+ */
 void memory_format_timestamp(uint64_t ts_ms, char *out, size_t outsz) {
     if (!out || outsz == 0) return;
     out[0] = '\0';
 #ifdef _WIN32
-    // Split into seconds and ms, then convert to SYSTEMTIME local time
+    // Separar a segundos y convertir a hora local (SYSTEMTIME)
     time_t sec = (time_t)(ts_ms / 1000ULL);
     struct tm lt;
     localtime_s(&lt, &sec);
-    // Format: YYYY-MM-DD HH:MM:SS
+    // Formato: YYYY-MM-DD HH:MM:SS
     snprintf(out, outsz, "%04d-%02d-%02d %02d:%02d:%02d",
              lt.tm_year + 1900, lt.tm_mon + 1, lt.tm_mday,
              lt.tm_hour, lt.tm_min, lt.tm_sec);
@@ -231,13 +314,22 @@ void memory_format_timestamp(uint64_t ts_ms, char *out, size_t outsz) {
 #endif
 }
 
+/**
+ * @brief Núcleo de escritura: inserta una entrada con ascii y key_used.
+ * @param ascii     Byte a almacenar.
+ * @param key_used  Clave asociada (metadato).
+ * @param out_index (Opc) devuelve índice asignado.
+ * @param out_ts    (Opc) devuelve timestamp de escritura.
+ * @return true si la escritura se realizó; false en caso de error/estado no válido.
+ * @note En compartido, sincroniza con spaces/items/ctrl y avisa 'full' al llenarse.
+ */
 static bool memory_write_core(uint8_t ascii, uint8_t key_used, uint32_t *out_index, uint64_t *out_ts) {
     uint64_t ts = now_ms();
     if (g_is_shared) {
 #ifdef _WIN32
-    if (!g_hSpaces || !g_hItems || !g_hControl || !g_sh) return false;
-        if (WaitForSingleObject(g_hSpaces, INFINITE) != WAIT_OBJECT_0) return false; // wait for space
-    if (WaitForSingleObject(g_hControl, INFINITE) != WAIT_OBJECT_0) return false; // enter critical section
+        if (!g_hSpaces || !g_hItems || !g_hControl || !g_sh) return false;
+        if (WaitForSingleObject(g_hSpaces, INFINITE) != WAIT_OBJECT_0) return false; // esperar espacio libre
+        if (WaitForSingleObject(g_hControl, INFINITE) != WAIT_OBJECT_0) return false; // entrar a sección crítica
         uint32_t idx = (uint32_t)g_sh->tail;
         g_sh_data[g_sh->tail].ascii = ascii;
         g_sh_data[g_sh->tail].index = idx;
@@ -245,18 +337,18 @@ static bool memory_write_core(uint8_t ascii, uint8_t key_used, uint32_t *out_ind
         g_sh_data[g_sh->tail].key_used = key_used;
         g_sh->tail = (g_sh->tail + 1) % g_sh->cap;
         g_sh->size++;
-    // If became full, signal full semaphore (binary)
-    if (g_sh->size == g_sh->cap) {
-        ReleaseSemaphore(g_hFull, 1, NULL);
-    }
-    ReleaseSemaphore(g_hControl, 1, NULL);
+        // Si pasó a “lleno”, señalizar 'full' (binario)
+        if (g_sh->size == g_sh->cap) {
+            ReleaseSemaphore(g_hFull, 1, NULL);
+        }
+        ReleaseSemaphore(g_hControl, 1, NULL);
         ReleaseSemaphore(g_hItems, 1, NULL);
         if (out_index) *out_index = idx; if (out_ts) *out_ts = ts;
         return true;
 #else
-    if (!g_sem_spaces || !g_sem_items || !g_sem_ctrl || !g_sh) return false;
+        if (!g_sem_spaces || !g_sem_items || !g_sem_ctrl || !g_sh) return false;
         sem_wait(g_sem_spaces);
-    sem_wait(g_sem_ctrl);
+        sem_wait(g_sem_ctrl);
         uint32_t idx = (uint32_t)g_sh->tail;
         g_sh_data[g_sh->tail].ascii = ascii;
         g_sh_data[g_sh->tail].index = idx;
@@ -264,10 +356,10 @@ static bool memory_write_core(uint8_t ascii, uint8_t key_used, uint32_t *out_ind
         g_sh_data[g_sh->tail].key_used = key_used;
         g_sh->tail = (g_sh->tail + 1) % g_sh->cap;
         g_sh->size++;
-    if (g_sh->size == g_sh->cap) {
-        sem_post(g_sem_full);
-    }
-    sem_post(g_sem_ctrl);
+        if (g_sh->size == g_sh->cap) {
+            sem_post(g_sem_full);
+        }
+        sem_post(g_sem_ctrl);
         sem_post(g_sem_items);
         if (out_index) *out_index = idx; if (out_ts) *out_ts = ts;
         return true;
@@ -287,14 +379,17 @@ static bool memory_write_core(uint8_t ascii, uint8_t key_used, uint32_t *out_ind
     }
 }
 
+/** @brief Escribe una entrada con ascii y key_used=0. */
 bool memory_write_entry(uint8_t ascii, uint32_t *out_index, uint64_t *out_ts) {
     return memory_write_core(ascii, 0u, out_index, out_ts);
 }
 
+/** @brief Escribe una entrada con ascii y clave asociada. */
 bool memory_write_entry_with_key(uint8_t ascii, uint8_t key_used, uint32_t *out_index, uint64_t *out_ts) {
     return memory_write_core(ascii, key_used, out_index, out_ts);
 }
 
+/** @brief Escribe un carácter (conversión a uint8_t implícita). */
 bool memory_write_char(char c) {
     if (g_is_shared) {
 #ifdef _WIN32
@@ -307,6 +402,11 @@ bool memory_write_char(char c) {
     }
 }
 
+/**
+ * @brief Escribe una cadena completa hasta '\0' o llenarse el buffer.
+ * @param s Cadena a escribir (UTF-8 opaco a nivel de bytes).
+ * @return Número de bytes escritos.
+ */
 size_t memory_write(const char *s) {
     if (!s) return 0;
     size_t written = 0;
@@ -317,35 +417,41 @@ size_t memory_write(const char *s) {
     return written;
 }
 
+/**
+ * @brief Lee una entrada (bloqueante sobre items en compartido).
+ * @param out (Opc) Devuelve la entrada leída.
+ * @return true si hubo lectura; false si no hay datos o estado no válido.
+ * @note Gestiona la bandera 'full' al salir del estado “lleno”.
+ */
 bool memory_read_entry(MemEntry *out) {
     if (g_is_shared) {
 #ifdef _WIN32
-    if (!g_hItems || !g_hSpaces || !g_hControl || !g_sh) return false;
+        if (!g_hItems || !g_hSpaces || !g_hControl || !g_sh) return false;
         if (WaitForSingleObject(g_hItems, INFINITE) != WAIT_OBJECT_0) return false;
-    if (WaitForSingleObject(g_hControl, INFINITE) != WAIT_OBJECT_0) return false;
-    bool was_full = (g_sh->size == g_sh->cap);
+        if (WaitForSingleObject(g_hControl, INFINITE) != WAIT_OBJECT_0) return false;
+        bool was_full = (g_sh->size == g_sh->cap);
         if (out) *out = g_sh_data[g_sh->head];
         g_sh->head = (g_sh->head + 1) % g_sh->cap;
         g_sh->size--;
-    if (was_full) {
-        // Drain full semaphore back to 0
-        while (WaitForSingleObject(g_hFull, 0) == WAIT_OBJECT_0) {}
-    }
-    ReleaseSemaphore(g_hControl, 1, NULL);
+        if (was_full) {
+            // Drenar 'full' de vuelta a 0
+            while (WaitForSingleObject(g_hFull, 0) == WAIT_OBJECT_0) {}
+        }
+        ReleaseSemaphore(g_hControl, 1, NULL);
         ReleaseSemaphore(g_hSpaces, 1, NULL);
         return true;
 #else
-    if (!g_sem_items || !g_sem_spaces || !g_sem_ctrl || !g_sh) return false;
+        if (!g_sem_items || !g_sem_spaces || !g_sem_ctrl || !g_sh) return false;
         sem_wait(g_sem_items);
-    sem_wait(g_sem_ctrl);
-    int was_full = (g_sh->size == g_sh->cap);
+        sem_wait(g_sem_ctrl);
+        int was_full = (g_sh->size == g_sh->cap);
         if (out) *out = g_sh_data[g_sh->head];
         g_sh->head = (g_sh->head + 1) % g_sh->cap;
         g_sh->size--;
-    if (was_full) {
-        while (sem_trywait(g_sem_full) == 0) {}
-    }
-    sem_post(g_sem_ctrl);
+        if (was_full) {
+            while (sem_trywait(g_sem_full) == 0) {}
+        }
+        sem_post(g_sem_ctrl);
         sem_post(g_sem_spaces);
         return true;
 #endif
@@ -358,6 +464,7 @@ bool memory_read_entry(MemEntry *out) {
     }
 }
 
+/** @brief Lee un solo carácter (atajo sobre memory_read_entry). */
 bool memory_read_char(char *out) {
     MemEntry e;
     if (!memory_read_entry(&e)) return false;
@@ -365,6 +472,12 @@ bool memory_read_char(char *out) {
     return true;
 }
 
+/**
+ * @brief Lee hasta 'max' caracteres en el buffer de salida.
+ * @param out Buffer destino (puede ser NULL para solo consumir).
+ * @param max Máximo de bytes a leer.
+ * @return Cantidad realmente leída.
+ */
 size_t memory_read(char *out, size_t max) {
     if (max == 0) return 0;
     size_t n = 0;
@@ -385,6 +498,13 @@ size_t memory_read(char *out, size_t max) {
     }
 }
 
+/**
+ * @brief Inspecciona sin consumir el elemento en posición relativa 'index'.
+ * @param index Índice relativo al head (0 = más antiguo).
+ * @param out   (Opc) Devuelve el carácter si existe.
+ * @return true si existe ese índice; false si está fuera de rango.
+ * @note En compartido se protege con semáforo de control.
+ */
 bool memory_peek(size_t index, char *out) {
     if (g_is_shared) {
 #ifdef _WIN32
@@ -417,6 +537,14 @@ bool memory_peek(size_t index, char *out) {
     }
 }
 
+/**
+ * @brief Inicializa/adjunta el backend compartido con nombre lógico.
+ * @param name        Nombre base para objetos (mapa/semáforos).
+ * @param capacity    Capacidad del buffer (mínimo 1).
+ * @param out_created (Opc) true si se creó; false si se adjuntó existente.
+ * @return true si se configuró correctamente; false ante error.
+ * @note En Windows usa CreateFileMapping/MapViewOfFile; en POSIX usa shm_open/mmap.
+ */
 bool memory_init_shared(const char *name, size_t capacity, bool *out_created) {
     if (capacity == 0) capacity = 1;
 #ifdef _WIN32
@@ -442,7 +570,7 @@ bool memory_init_shared(const char *name, size_t capacity, bool *out_created) {
         g_sh->head = g_sh->tail = g_sh->size = 0;
     } else {
         if (g_sh->cap != capacity) {
-            // capacity mismatch -> fail
+            // discrepancia de capacidad -> fallar
             UnmapViewOfFile(g_sh); g_sh = NULL; g_sh_data = NULL;
             CloseHandle(g_hMap); g_hMap = NULL;
             return false;
@@ -463,7 +591,7 @@ bool memory_init_shared(const char *name, size_t capacity, bool *out_created) {
     g_is_shared = 1;
     return true;
 #else
-    // POSIX implementation
+    // Implementación POSIX
     sanitize_name(name ? name : "mem", g_name_mem, sizeof(g_name_mem));
     snprintf(g_name_ctrl, sizeof(g_name_ctrl), "/%s_ctrl", g_name_mem);
     snprintf(g_name_items, sizeof(g_name_items), "/%s_items", g_name_mem);
@@ -490,15 +618,15 @@ bool memory_init_shared(const char *name, size_t capacity, bool *out_created) {
         munmap(p, mapSize); g_sh = NULL; g_sh_data = NULL; close(g_sh_fd); g_sh_fd = -1; return false;
     }
 
-    g_sem_ctrl = sem_open(g_name_ctrl, O_CREAT, 0600, 1);
+    g_sem_ctrl  = sem_open(g_name_ctrl,  O_CREAT, 0600, 1);
     if (g_sem_ctrl == SEM_FAILED) { memory_shutdown(); return false; }
     g_sem_items = sem_open(g_name_items, O_CREAT, 0600, 0);
     if (g_sem_items == SEM_FAILED) { memory_shutdown(); return false; }
-    g_sem_spaces = sem_open(g_name_spaces, O_CREAT, 0600, (unsigned int)capacity);
-    if (g_sem_spaces == SEM_FAILED) { memory_shutdown(); return false; }
-    g_sem_full = sem_open(g_name_full, O_CREAT, 0600, 0);
+    g_sem_spaces= sem_open(g_name_spaces,O_CREAT, 0600, (unsigned int)capacity);
+    if (g_sem_spaces== SEM_FAILED) { memory_shutdown(); return false; }
+    g_sem_full  = sem_open(g_name_full,  O_CREAT, 0600, 0);
     if (g_sem_full == SEM_FAILED) { memory_shutdown(); return false; }
-    g_sem_term = sem_open(g_name_term, O_CREAT, 0600, 0);
+    g_sem_term  = sem_open(g_name_term,  O_CREAT, 0600, 0);
     if (g_sem_term == SEM_FAILED) { memory_shutdown(); return false; }
 
     g_is_shared = 1;
@@ -506,6 +634,10 @@ bool memory_init_shared(const char *name, size_t capacity, bool *out_created) {
 #endif
 }
 
+/**
+ * @brief Imprime un snapshot del contenido del buffer (debug).
+ * @note En compartido, protege el recorrido con semáforo de control.
+ */
 void memory_debug_print_snapshot(void) {
     size_t cap = memory_capacity();
     size_t sz = memory_size();
@@ -514,7 +646,7 @@ void memory_debug_print_snapshot(void) {
     if (g_is_shared) {
 #ifdef _WIN32
         if (!g_sh) return;
-    WaitForSingleObject(g_hControl, INFINITE);
+        WaitForSingleObject(g_hControl, INFINITE);
         size_t cur = g_sh->head;
         for (size_t i = 0; i < g_sh->size; ++i) {
             MemEntry e = g_sh_data[cur];
@@ -522,10 +654,10 @@ void memory_debug_print_snapshot(void) {
             printf("  #%02zu slot=%02zu ascii=%3u time=%s key=0x%02X\n", i, cur, (unsigned)e.ascii, when, (unsigned)e.key_used);
             cur = (cur + 1) % g_sh->cap;
         }
-    ReleaseSemaphore(g_hControl, 1, NULL);
+        ReleaseSemaphore(g_hControl, 1, NULL);
 #else
         if (!g_sh) return;
-    sem_wait(g_sem_ctrl);
+        sem_wait(g_sem_ctrl);
         size_t cur = g_sh->head;
         for (size_t i = 0; i < g_sh->size; ++i) {
             MemEntry e = g_sh_data[cur];
@@ -533,7 +665,7 @@ void memory_debug_print_snapshot(void) {
             printf("  #%02zu slot=%02zu ascii=%3u time=%s key=0x%02X\n", i, cur, (unsigned)e.ascii, when, (unsigned)e.key_used);
             cur = (cur + 1) % g_sh->cap;
         }
-    sem_post(g_sem_ctrl);
+        sem_post(g_sem_ctrl);
 #endif
     } else {
         size_t cur = g_mem.head;
@@ -546,12 +678,16 @@ void memory_debug_print_snapshot(void) {
     }
 }
 
-// Termination helpers
+/* ----------------------------- Terminación -------------------------------- */
+/**
+ * @brief Difunde una señal de terminación para despertar potenciales esperadores.
+ * @note Implementada como múltiples posts sobre el semáforo 'term'.
+ */
 void memory_broadcast_terminate(void) {
     if (!g_is_shared) return;
 #ifdef _WIN32
     if (g_hTerm) {
-        // large release count to wake any potential waiters
+        // Publicación masiva para despertar potenciales esperadores
         ReleaseSemaphore(g_hTerm, 0x10000, NULL);
     }
 #else
@@ -561,6 +697,10 @@ void memory_broadcast_terminate(void) {
 #endif
 }
 
+/**
+ * @brief Consulta no bloqueante: ¿se notificó terminación?
+ * @return true si se detectó la señal (se reinyecta para que sea idempotente).
+ */
 bool memory_termination_notified(void) {
     if (!g_is_shared) return false;
 #ifdef _WIN32
