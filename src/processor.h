@@ -4,6 +4,7 @@
  * Propósito:
  *  - Declarar las funciones para codificar un archivo con XOR de 8 bits y
  *    escribirlo en el backend de memoria (local/compartido).
+ *  - Ahora incluye soporte para procesos pesados (sin hilos SDL).
  * ========================================================================== */
 
 #ifndef PROCESSOR_H
@@ -22,12 +23,12 @@
 bool process_file_into_memory(const char *filepath, const char *key_bits, bool automatic);
 
 /**
- * @brief Inicia el procesamiento en un hilo en segundo plano.
- * @param filepath Ruta del archivo.
- * @param key_bits Cadena binaria para XOR (ver arriba).
- * @param automatic Modo automático/manual.
- * @return true si el hilo se creó correctamente.
+ * @brief Inicia el procesamiento como un proceso independiente (sin hilos).
+ * @param filepath Ruta del archivo origen (UTF-8).
+ * @param key_bits Cadena binaria para derivar clave XOR de 8 bits.
+ * @param automatic true=Automático, false=Manual.
+ * @return true si el proceso se lanzó correctamente; false en caso contrario.
  */
-bool processor_start_async(const char *filepath, const char *key_bits, bool automatic);
+bool processor_start_heavy(const char *filepath, const char *key_bits, bool automatic);
 
 #endif // PROCESSOR_H

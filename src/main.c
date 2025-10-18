@@ -1,173 +1,98 @@
-#include <SDL.h>
-#include <SDL_ttf.h>
-#include <stdio.h>
-#include <stdbool.h>
+/* ============================================================================
+ * main.c — Prueba integrada del sistema Heavy Process
+ * ----------------------------------------------------------------------------
+ * Permite inicializar memoria compartida, cargar un archivo y lanzar procesos
+ * independientes que usan la API de memoria y procesamiento.
+ * ========================================================================= */
 
-#include "pages/modo_operacion.h"
-#include "pages/inicializador.h"
-#include "pages/page_two.h"
-#include "pages/nueva_instancia.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
+#include "processor.h"
 #include "memory.h"
 
-/* ============================================================================
- * main.c — UI de navegación con SDL2/SDL_ttf
- * ----------------------------------------------------------------------------
- * Propósito:
- *  - Crear una ventana y renderer SDL.
- *  - Cargar una fuente TTF desde varios paths candidatos.
- *  - Despachar eventos a páginas (handlers) y renderizar la página activa.
- *
- * Puntos clave de diseño:
- *  - El enum Page modela el estado de navegación; cada handler puede pedir
- *    cambio de página vía un "next" (entero >= 0).
- *  - El bucle principal procesa todos los eventos en cola con SDL_PollEvent,
- *    luego dibuja la escena y presenta con SDL_RenderPresent.
- *  - Se añade un pequeño SDL_Delay(10) para evitar uso intensivo de CPU.
- *  - Al salir, se liberan recursos en orden inverso a su adquisición.
- *
- * Notas:
- *  - La fuente se busca en varios paths típicos además de "font.ttf" local.
- *  - memory_shutdown() se invoca al final por si el backend de memoria fue
- *    inicializado en alguna de las páginas.
- * ========================================================================== */
+int main(void) {
+    printf("=== Proyecto I Sistemas Operativos - Prueba Heavy Process ===\n");
 
+    // --- Configuración inicial ---
+    char mem_name[128];
+    char file_path[256];
+    char key_bits[16];
+    size_t capacity;
+    int modo;
+    bool created = false;
 
-#define WINDOW_W 800   /* Ancho de la ventana principal en píxeles */
-#define WINDOW_H 600   /* Alto de la ventana principal en píxeles */
+    printf("\nSeleccione modo:\n");
+    printf("  1) Memoria local (debug)\n");
+    printf("  2) Memoria compartida (heavy process)\n> ");
+    scanf("%d", &modo);
+    getchar(); // limpiar newline
 
-/* Estado de navegación entre pantallas de la app */
-typedef enum { PAGE_MAIN, PAGE_ONE, PAGE_TWO, PAGE_SENDER } Page;
+    if (modo == 2) {
+        printf("Ingrese nombre lógico de la memoria compartida (ejemplo: mem_ascii): ");
+        fgets(mem_name, sizeof(mem_name), stdin);
+        mem_name[strcspn(mem_name, "\n")] = '\0'; // quitar \n
 
-/**
- * @brief Punto de entrada de la aplicación.
- * @param argc Recuento de argumentos de línea de comandos.
- * @param argv Arreglo de argumentos de línea de comandos.
- * @return 0 en caso de finalización correcta; distinto de 0 si falla init.
- *
- * Flujo:
- *  1) Inicializa SDL (vídeo) y SDL_ttf.
- *  2) Crea ventana y renderer acelerado con VSync.
- *  3) Intenta cargar una fuente TTF desde múltiples ubicaciones conocidas.
- *  4) Bucle principal:
- *     - Consume eventos (QUIT y delega al handler de la página activa).
- *     - Dibuja la página activa y presenta.
- *  5) Libera recursos y apaga subsistemas.
- */
-int main(int argc, char **argv) {
-    /* Inicialización de SDL Video */
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-        fprintf(stderr, "SDL_Init Error: %s\n", SDL_GetError());
-        return 1;
-    }
-    /* Inicialización de SDL_ttf para manejo de fuentes */
-    if (TTF_Init() != 0) {
-        fprintf(stderr, "TTF_Init Error: %s\n", TTF_GetError());
-        SDL_Quit();
-        return 1;
-    }
+        printf("Capacidad del buffer (número de caracteres): ");
+        scanf("%zu", &capacity);
+        getchar();
 
-    /* Creación de ventana centrada */
-    SDL_Window *win = SDL_CreateWindow("App con 2 botones", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_W, WINDOW_H, SDL_WINDOW_SHOWN);
-    if (!win) {
-        fprintf(stderr, "CreateWindow Error: %s\n", SDL_GetError());
-        TTF_Quit();
-        SDL_Quit();
-        return 1;
-    }
-
-    /* Renderer acelerado + sincronizado con VBlank (reduce tearing/CPU) */
-    SDL_Renderer *ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    if (!ren) {
-        fprintf(stderr, "CreateRenderer Error: %s\n", SDL_GetError());
-        SDL_DestroyWindow(win);
-        TTF_Quit();
-        SDL_Quit();
-        return 1;
-    }
-
-    /* Carga de fuente — se intentan varios candidatos comunes del sistema */
-    // Load font - expects "font.ttf" in current working directory
-    TTF_Font *font = NULL;
-    const char *font_candidates[] = {
-        "font.ttf",
-        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
-        "/usr/share/fonts/truetype/freefont/FreeSans.ttf",
-        NULL
-    };
-    // Try loading from multiple common locations
-    for (int i = 0; font_candidates[i] != NULL; ++i) {
-        font = TTF_OpenFont(font_candidates[i], 24);
-        if (font) {
-            printf("[INFO] Using font: %s\n", font_candidates[i]);
-            break;
+        if (!memory_init_shared(mem_name, capacity, &created)) {
+            fprintf(stderr, "❌ Error: no se pudo inicializar la memoria compartida '%s'\n", mem_name);
+            return 1;
         }
+        printf("✔ Memoria compartida '%s' %s (capacidad=%zu)\n",
+               mem_name, created ? "creada" : "adjuntada", memory_capacity());
+    } else {
+        printf("Capacidad del buffer local: ");
+        scanf("%zu", &capacity);
+        getchar();
+        if (!memory_init(capacity)) {
+            fprintf(stderr, "❌ Error al inicializar memoria local.\n");
+            return 1;
+        }
+        printf("✔ Memoria local creada (capacidad=%zu)\n", memory_capacity());
     }
-    if (!font) {
-        /* Si no hay fuente, no se puede renderizar texto de las páginas */
-        fprintf(stderr, "Failed to open font.ttf: %s\n", TTF_GetError());
-        SDL_DestroyRenderer(ren);
-        SDL_DestroyWindow(win);
-        TTF_Quit();
-        SDL_Quit();
+
+    // --- Configurar archivo y clave ---
+    printf("\nRuta del archivo a procesar (texto o binario): ");
+    fgets(file_path, sizeof(file_path), stdin);
+    file_path[strcspn(file_path, "\n")] = '\0';
+
+    printf("Clave XOR (8 o 9 bits, ej. 10101010): ");
+    fgets(key_bits, sizeof(key_bits), stdin);
+    key_bits[strcspn(key_bits, "\n")] = '\0';
+
+    int auto_opt;
+    printf("Modo automático? (1=Sí, 0=Manual): ");
+    scanf("%d", &auto_opt);
+    getchar();
+
+    bool automatic = (auto_opt != 0);
+
+    // --- Iniciar procesamiento ---
+    printf("\nLanzando proceso pesado (heavy process)...\n");
+
+    if (!processor_start_heavy(file_path, key_bits, automatic)) {
+        fprintf(stderr, "❌ Error: no se pudo lanzar el proceso de procesamiento.\n");
+        memory_shutdown();
         return 1;
     }
 
-    bool running = true;
-    SDL_Event e;
-    Page page = PAGE_MAIN;  /* Página inicial */
+    printf("✔ Procesamiento iniciado correctamente.\n");
+    printf("Esperando procesamiento...\n");
 
-    /* ========================= BUCLE PRINCIPAL =========================
-     * Estructura:
-     *  - Consumir todos los eventos pendientes.
-     *  - Delegar a la página actual para que actualice "next" si desea
-     *    cambiar de pantalla (navegación explícita).
-     *  - Dibujar la pantalla actual y presentar.
-     * ================================================================== */
-    while (running) {
-        while (SDL_PollEvent(&e)) {
-            if (e.type == SDL_QUIT) running = false;
-            else {
-                int next = -1; /* -1 = sin cambio de página */
-                if (page == PAGE_MAIN) page_main_handle_event(&e, ren, &next);
-                else if (page == PAGE_ONE) page_one_handle_event(&e, &next);
-                else if (page == PAGE_TWO) page_two_handle_event(&e, &next);
-                else if (page == PAGE_SENDER) page_sender_handle_event(&e, &next);
-                if (next >= 0) page = (Page)next; /* Commit de la navegación */
-            }
-        }
+    // Simulación de espera activa (solo para pruebas)
+    printf("Presione ENTER para ver snapshot final.\n");
+    getchar();
 
-        /* Limpiar fondo con gris claro antes de renderizar UI */
-        // Render
-        SDL_SetRenderDrawColor(ren, 220, 220, 220, 255);
-        SDL_RenderClear(ren);
+    memory_debug_print_snapshot();
 
-        /* Render de la página activa. Cada página define su propia vista. */
-        if (page == PAGE_MAIN) {
-            page_main_render(ren, font);
-        } else if (page == PAGE_ONE) {
-            page_one_render(ren, font);
-        } else if (page == PAGE_TWO) {
-            page_two_render(ren, font);
-        } else if (page == PAGE_SENDER) {
-            page_sender_render(ren, font);
-        }
-
-        /* Presenta el frame y cede un poco de tiempo a la CPU */
-        SDL_RenderPresent(ren);
-        SDL_Delay(10);
-    }
-
-    /* Destrucción ordenada de recursos gráficos y tipográficos */
-    TTF_CloseFont(font);
-    SDL_DestroyRenderer(ren);
-    SDL_DestroyWindow(win);
-
-    /* Liberar backend de memoria en caso de haber sido inicializado */
-    // Release memory backend resources if initialized
+    printf("\nFinalizando recursos...\n");
+    memory_broadcast_terminate();
     memory_shutdown();
 
-    /* Apagado de subsistemas en orden inverso al inicio */
-    TTF_Quit();
-    SDL_Quit();
+    printf("✅ Ejecución finalizada correctamente.\n");
     return 0;
 }
