@@ -44,7 +44,7 @@ void imprimir_produccion(const struct CharInfo* info, char char_original) {
     printf("Hora: %s |\n", time_str);
 }
 
-void receptor_worker(const char* shm_name, const char* modo_ejecucion, unsigned char clave_decodificar, const char* archivo_salida_nombre) {
+void receptor_worker(const char* shm_name, const char* modo_ejecucion, const char* archivo_salida_nombre) {
     // Validar modo
     int modo_manual = 0;
     if (strcmp(modo_ejecucion, "manual") == 0) {
@@ -96,6 +96,8 @@ void receptor_worker(const char* shm_name, const char* modo_ejecucion, unsigned 
         fprintf(stderr, "Error (PID %d) al abrir el archivo salida: %s\n", getpid(), archivo_salida_nombre);
         reportar_error_y_salir("fopen");
     }
+
+    unsigned char clave_decodificar = memoria->llave_desencriptar;
 
     if (sem_wait(sem_mutex) == -1) reportar_error_y_salir("sem_wait (mutex register)");
     memoria->receptores_activos++;
@@ -183,15 +185,14 @@ void receptor_worker(const char* shm_name, const char* modo_ejecucion, unsigned 
 
 int main(int argc, char *argv[]) {
     // --- Validar argumentos ---
-    if (argc != 5) {
-        fprintf(stderr, "Uso: %s <shm_id> <modo (manual|automatico)> <clave [0, 255]> <num_receptores>\n", argv[0]);
+    if (argc != 4) {
+        fprintf(stderr, "Uso: %s <shm_id> <modo (manual|automatico)> <num_receptores>\n", argv[0]);
         exit(EXIT_FAILURE);
     }
 
     const char* shm_name = argv[1];
     const char* modo_ejecucion = argv[2];
-    int clave_int = atoi(argv[3]);
-    int num_receptores = atoi(argv[4]);
+    int num_receptores = atoi(argv[3]);
 
     const char* dir_salida = "files";
     const char* archivo_salida_nombre = "files/output.txt";
@@ -207,13 +208,6 @@ int main(int argc, char *argv[]) {
         reportar_error_y_salir("fopen (truncar en main)");
     }
     fclose(fp);
-
-    if (clave_int < 0 || clave_int > 255) {
-        fprintf(stderr, "Error: La clave debe ser un valor de 8 bits (0-255).\n");
-        exit(EXIT_FAILURE);
-    }
-
-    unsigned char clave_decodificar = (unsigned char)clave_int;
 
     if (num_receptores <= 0) {
         fprintf(stderr, "Error: El numero de receptores debe ser 1 o mas.\n");
@@ -266,7 +260,7 @@ int main(int argc, char *argv[]) {
             // Heavy process
 
             // Paso de argumentos que el padre parseo
-            receptor_worker(shm_name, modo_ejecucion, clave_decodificar, archivo_salida_nombre);
+            receptor_worker(shm_name, modo_ejecucion, archivo_salida_nombre);
 
             // El hijo termina aqui para no continuar en el bucle 'for' del padre
             exit(EXIT_SUCCESS);

@@ -46,7 +46,7 @@ void imprimir_produccion(const struct CharInfo* info, char char_original) {
 
 
 // Logica principal del emisor - Cada proceso HIJO (creado por fork) ejecutara esta funcion
-void emisor_worker(const char* shm_name, const char* modo_ejecucion, unsigned char clave_codificar){
+void emisor_worker(const char* shm_name, const char* modo_ejecucion) {
     // Validar modo
     int modo_manual = 0;
     if (strcmp(modo_ejecucion, "manual") == 0) {
@@ -98,6 +98,8 @@ void emisor_worker(const char* shm_name, const char* modo_ejecucion, unsigned ch
         fprintf(stderr, "Error (PID %d) al abrir el archivo fuente: %s\n", getpid(), memoria->archivo_fuente);
         reportar_error_y_salir("fopen");
     }
+
+    unsigned char clave_codificar = memoria->llave_desencriptar;
 
     if (sem_wait(sem_mutex) == -1) reportar_error_y_salir("sem_wait (mutex register)");
     memoria->emisores_activos++;
@@ -208,22 +210,14 @@ void emisor_worker(const char* shm_name, const char* modo_ejecucion, unsigned ch
 // Parsea los argumentos - Proceso PADRE que crea N procesos hijos
 int main(int argc, char *argv[]){
     // --- Validar argumentos ---
-    if (argc != 5) {
-        fprintf(stderr, "Uso: %s <shm_id> <modo (manual|automatico)> <clave [0, 255]> <num_emisores>\n", argv[0]);
+    if (argc !=  4) {
+        fprintf(stderr, "Uso: %s <shm_id> <modo (manual|automatico)> <num_emisores>\n", argv[0]);
         exit(EXIT_FAILURE);
     }
 
     const char* shm_name = argv[1];
     const char* modo_ejecucion = argv[2];
-    int clave_int = atoi(argv[3]);
-    int num_emisores = atoi(argv[4]);
-
-    if (clave_int < 0 || clave_int > 255) {
-        fprintf(stderr, "Error: La clave debe ser un valor de 8 bits (0-255).\n");
-        exit(EXIT_FAILURE);
-    }
-
-    unsigned char clave_codificar = (unsigned char)clave_int;
+    int num_emisores = atoi(argv[3]);
 
     if (num_emisores <= 0) {
         fprintf(stderr, "Error: El numero de emisores debe ser 1 o mas.\n");
@@ -277,7 +271,7 @@ int main(int argc, char *argv[]){
             // Heavy process
 
             // Paso de argumentos que el padre parseo
-            emisor_worker(shm_name, modo_ejecucion, clave_codificar);
+            emisor_worker(shm_name, modo_ejecucion);
 
             // El hijo termina aqui para no continuar en el bucle 'for' del padre
             exit(EXIT_SUCCESS);

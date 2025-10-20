@@ -9,8 +9,8 @@ gcc finalizador.c -o finalizador -lrt -lpthread
 Ejecutar:
 ```bash
 ./build/inicializador
-./build/emisor <shm_id> <modo> <clave> <num_emisores>
-./build/receptor <shm_id> <modo> <clave> <num_receptores>
+./build/emisor <shm_id> <modo> <num_emisores>
+./build/receptor <shm_id> <modo> <num_receptores>
 ./build/finalizador <shm_id>
 ```
 

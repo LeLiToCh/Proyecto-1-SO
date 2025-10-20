@@ -27,9 +27,10 @@ int main(int argc, char *argv[]) {
     // --- Declarar variables para almacenar la entrada ---
     char shm_name[256];
     char buffer_size_str[50]; // Buffer temporar para leer el numero
-    char decrypt_key[128];
     char source_file[256];
     int buffer_size;
+    char llave_str[10];
+    int llave_num;
 
     // --- Solicitar Parametros al Usuario ---
     printf("--- Configuracion del Inicializador ---\n");
@@ -48,7 +49,13 @@ int main(int argc, char *argv[]) {
     // 3. Llave
     printf("Ingrese la llave para desencriptar: ");
     fflush(stdout);
-    leer_linea(decrypt_key, sizeof(decrypt_key));
+    leer_linea(llave_str, sizeof(llave_str));
+    llave_num = atoi(llave_str);
+
+    if (llave_num < 0 || llave_num > 255){
+        fprintf (stderr, "La llave debe ser un numero de 8 bits [0, 255]");
+        exit(EXIT_FAILURE);
+    }
 
     // 4. Archivo fuente
     printf("Ingrese el nombre del archivo fuente: ");
@@ -93,7 +100,7 @@ int main(int argc, char *argv[]) {
     printf("--------------------------------\n");
     printf("Iniciando recursos con ID base: %s\n", shm_name);
     printf("\t -> Buffer size: %d\n", buffer_size);
-    printf("\t -> Llave: %s\n", decrypt_key);
+    printf("\t -> Llave: %d\n", llave_num);
     printf("\t -> Archivo: %s\n", source_file);
     printf("--------------------------------\n");
 
@@ -145,7 +152,7 @@ int main(int argc, char *argv[]) {
     memoria->receptores_activos = 0;
     memoria->emisores_totales = 0;
     memoria->receptores_totales = 0;
-    strncpy(memoria->llave_desencriptar, decrypt_key, sizeof(memoria->llave_desencriptar) - 1);
+    memoria->llave_desencriptar = (unsigned char)llave_num;
     strncpy(memoria->archivo_fuente, source_file, sizeof(memoria->archivo_fuente) - 1);
 
     memset(memoria->buffer, 0, buffer_size * sizeof(struct CharInfo));

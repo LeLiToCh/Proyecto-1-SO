@@ -19,7 +19,7 @@ struct MemoriaCompartida {
     int idx_archivo_escritura;      // Indice global para la escritura del archivo final
 
     // --- Informacion solicitada ---
-    char llave_desencriptar[128];
+    unsigned char llave_desencriptar;
     char archivo_fuente[256];
 
     // --- Auditoria ---
