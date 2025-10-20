@@ -89,6 +89,7 @@ void emisor_worker(const char* shm_name, const char* modo_ejecucion) {
     struct MemoriaCompartida *memoria = (struct MemoriaCompartida *)mmap(
         NULL, total_size, PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0
     );
+    close(shm_fd);
 
     if (memoria == MAP_FAILED) reportar_error_y_salir("mmap");
 
@@ -113,7 +114,7 @@ void emisor_worker(const char* shm_name, const char* modo_ejecucion) {
         // --- INICIO SECCION CRITICA (INDICE DE ARCHIVO) ---
         if (sem_wait(sem_mutex) == -1) {
             if (errno == EINTR) continue;
-            reportar_error_y_salir("sem_wait (mutex)");
+            reportar_error_y_salir("sem_wait (mutex get work)");
         }
         
         // --- CHEQUEO DE CIERRE ---
@@ -125,15 +126,17 @@ void emisor_worker(const char* shm_name, const char* modo_ejecucion) {
         mi_indice_archivo = memoria->idx_archivo_lectura;
         memoria->idx_archivo_lectura++;
 
+        if (sem_post(sem_mutex) == -1) {
+            if (errno == EINTR) continue;
+            reportar_error_y_salir("sem_post (mutex get work)");
+        }
+        // --- FIN SECCION CRITICA (INDICE DE ARCHIVO) ---
+
         if (fseek(archivo_fuente, mi_indice_archivo, SEEK_SET) != 0) {
             sem_post(sem_mutex);
             break; 
         }
-
         char_leido = fgetc(archivo_fuente);
-        
-        if (sem_post(sem_mutex) == -1) reportar_error_y_salir("sem_post (mutex)");
-        // --- FIN SECCION CRITICA (INDICE DE ARCHIVO)---
 
         if (char_leido == EOF) break;
         if (char_leido == '\n' || char_leido == '\r') continue;
@@ -152,7 +155,7 @@ void emisor_worker(const char* shm_name, const char* modo_ejecucion) {
         // --- INICIO SECCION CRITICA (ESCRITURA DE BUFFER) ---
         if (sem_wait(sem_mutex) == -1) {
             if (errno == EINTR) continue;
-            reportar_error_y_salir("sem_wait (mutex)");
+            reportar_error_y_salir("sem_wait (mutex write)");
         }
 
         // --- CHEQUEO DE CIERRE (DOBLE) ---
@@ -173,7 +176,7 @@ void emisor_worker(const char* shm_name, const char* modo_ejecucion) {
         memoria->idx_escritura = (indice_escritura_buffer + 1) % memoria->buffer_size;
         memoria->total_producidos++;
 
-        if (sem_post(sem_mutex) == -1) reportar_error_y_salir ("sem_post (mutex)");
+        if (sem_post(sem_mutex) == -1) reportar_error_y_salir ("sem_post (mutex write)");
         // --- FIN SECCION CRITICA (ESCRITURA DE BUFFER) ---
 
         // Senalizar que hay un nuevo espacio lleno
@@ -277,11 +280,11 @@ int main(int argc, char *argv[]){
             exit(EXIT_SUCCESS);
         }
 
-        printf(ANSI_COLOR_GREEN "[PADRE (PID: %d)] Creado emisor hijo con PID: %d\n" ANSI_COLOR_RESET, getpid(), pid);
+        // printf(ANSI_COLOR_GREEN "[PADRE (PID: %d)] Creado emisor hijo con PID: %d\n" ANSI_COLOR_RESET, getpid(), pid);
     }
 
     // --- Espera del Padre ---
-    printf(ANSI_COLOR_GREEN "[PADRE (PID: %d)] Todos los hijos lanzados. Esperando a que terminen...\n" ANSI_COLOR_RESET, getpid());
+    // printf(ANSI_COLOR_GREEN "[PADRE (PID: %d)] Todos los hijos lanzados. Esperando a que terminen...\n" ANSI_COLOR_RESET, getpid());
 
     int status;
     pid_t wpid;

@@ -115,6 +115,10 @@ void receptor_worker(const char* shm_name, const char* modo_ejecucion, const cha
             printf(ANSI_COLOR_YELLOW "[RECEPTOR HIJO (PID: %d)] Presione ENTER para consumir item...\n" ANSI_COLOR_RESET, getpid());
             getchar();
         }
+        
+        struct CharInfo item;
+        int mi_indice_archivo_salida;
+
 
         // --- INICIO SECCION CRITICA (LECTURA DE BUFFER) ---
         if (sem_wait(sem_mutex) == -1) {
@@ -129,10 +133,10 @@ void receptor_worker(const char* shm_name, const char* modo_ejecucion, const cha
         }
 
         int indice_lectura_buffer = memoria->idx_lectura;
-        struct CharInfo item = memoria->buffer[indice_lectura_buffer];
+        item = memoria->buffer[indice_lectura_buffer];
         memoria->idx_lectura = (indice_lectura_buffer + 1) % memoria->buffer_size;
 
-        int mi_indice_archivo_salida = memoria->idx_archivo_escritura;
+        mi_indice_archivo_salida = memoria->idx_archivo_escritura;
         memoria->idx_archivo_escritura++;
         
         memoria->total_consumidos++;
@@ -145,17 +149,13 @@ void receptor_worker(const char* shm_name, const char* modo_ejecucion, const cha
 
         // Decodificar el Item (fuera de la seccion critica)
         char cahr_decodificado = item.valor_ascii ^ clave_decodificar;
-
         if (fseek(archivo_salida, mi_indice_archivo_salida, SEEK_SET) != 0) {
             reportar_error_y_salir("fseek (archivo salida)");
         }
-
         if (fputc(cahr_decodificado, archivo_salida) == EOF) {
             reportar_error_y_salir("fputc (archivo salida)");
         }
-
         fflush(archivo_salida);
-
         imprimir_produccion(&item, cahr_decodificado);
     }
 
@@ -266,11 +266,11 @@ int main(int argc, char *argv[]) {
             exit(EXIT_SUCCESS);
         }
         
-        printf(ANSI_COLOR_GREEN "[PADRE (PID: %d)] Creado receptor hijo con PID: %d\n" ANSI_COLOR_RESET, getpid(), pid);
+        // printf(ANSI_COLOR_GREEN "[PADRE (PID: %d)] Creado receptor hijo con PID: %d\n" ANSI_COLOR_RESET, getpid(), pid);
     }
 
-    printf(ANSI_COLOR_GREEN "[PADRE (PID: %d)] Todos los hijos lanzados. Esperando a que terminen...\n" ANSI_COLOR_RESET, getpid());
-    printf(ANSI_COLOR_GREEN "(El padre y los hijos se bloquearán esperando datos. Use Ctrl+C para terminar)\n" ANSI_COLOR_RESET);
+    // printf(ANSI_COLOR_GREEN "[PADRE (PID: %d)] Todos los hijos lanzados. Esperando a que terminen...\n" ANSI_COLOR_RESET, getpid());
+    // printf(ANSI_COLOR_GREEN "(El padre y los hijos se bloquearán esperando datos. Use Ctrl+C para terminar)\n" ANSI_COLOR_RESET);
 
     for (int i = 0; i < num_receptores; i++) {
         int status;
